@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 import datetime
+from sensor import CameraProcessor
 
 State = Enum('STAND SIT AWAY UNKNOWN')
 
@@ -21,3 +22,11 @@ class Moment:
 class ActivityLog:
     _log: [Moment]
     Interval: int = 1
+
+
+class StandzaProcessor:
+    camera = CameraProcessor()
+    pending = []
+
+    def timer_elapsed(self):
+        pass
