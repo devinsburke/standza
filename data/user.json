@@ -1,0 +1,76 @@
+{
+	"Schedule": {
+		"Days": [
+			{
+				"Name": "Monday",
+				"StartTime": "8:00 AM",
+				"EndTime": "5:00 PM",
+				"Enabled": true
+			},
+			{
+				"Name": "Tuesday",
+				"StartTime": "8:00 AM",
+				"EndTime": "5:00 PM",
+				"Enabled": true
+			},
+			{
+				"Name": "Wednesday",
+				"StartTime": "5:30 AM",
+				"EndTime": "5:00 PM",
+				"Enabled": true
+			},
+			{
+				"Name": "Thursday",
+				"StartTime": "8:00 AM",
+				"EndTime": "5:00 PM",
+				"Enabled": false
+			},
+			{
+				"Name": "Friday",
+				"StartTime": "8:00 AM",
+				"EndTime": "5:00 PM",
+				"Enabled": true
+			},
+			{
+				"Name": "Saturday",
+				"StartTime": "8:00 AM",
+				"EndTime": "5:00 PM",
+				"Enabled": true
+			},
+			{
+				"Name": "Sunday",
+				"StartTime": "8:00 AM",
+				"EndTime": "5:00 PM",
+				"Enabled": false
+			}
+		]
+	},
+	"Goals": [
+		"stand-day-minimum",
+		"break-now-maximum",
+		"work-day-clock",
+		"work-day-minimum"
+	],
+	"Parameters": {
+		"stand_day_minimum": {
+			"Value": 0,
+			"Interval": "minute"
+		},
+		"stand_frequency": {
+			"Value": 0,
+			"Interval": "minute"
+		},
+		"stand_maximum": {
+			"Value": 0,
+			"Interval": "minute"
+		},
+		"work_day_minimum": {
+			"Value": "8",
+			"Interval": "hour"
+		},
+		"away_now_maximum": {
+			"Value": "15",
+			"Interval": "minute"
+		}
+	}
+}
