@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="./styles.css" rel="stylesheet">
+        <title>Standza</title>
+    </head>
+    <body>
+        <div id="drawer">
+            <ul>
+                <li class="drawer-option selected-tab" onClick="changeTab('home')" id="tab-home"><i class="material-icons">home</i></li>
+                <li class="drawer-option" onClick="changeTab('calendar')" id="tab-calendar"><i class="material-icons">date_range</i></li>
+                <li class="drawer-option" onClick="changeTab('settings')" id="tab-settings"><i class="material-icons">settings</i></li>
+                <li class="drawer-option" onClick="changeTab('preview')" id="tab-preview"><i class="material-icons">camera</i></li>
+            </ul>
+        </div>
+        <div id="content-container">
+            <div id="home">
+                
+            </div>
+            <div id="calendar">
+                <h1>Schedule</h1>
+                <div class="card-primary">
+                    <ol class="select-list" id="schedule-list"></ol>
+                </div>
+            </div>
+            <div id="settings">
+                <h1>Settings</h1>
+                <div class="card-primary">
+                    <div class="sub-container"></div>
+                </div>
+            </div>
+            <div id="preview">
+                <h1>Camera Preview</h1>
+                <div class="card-primary">
+                    <div id="capture-wrapper">
+                        <video id="video-capture" autoplay="true"></video>
+                        <canvas id="canvas-capture"></canvas>
+                        <img id="img-capture" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="./renderer.js"></script>
+        <script src="./index.js"></script>
+    </body>
+</html>
