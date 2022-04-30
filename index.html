@@ -10,6 +10,7 @@
         <div id="drawer">
             <ul>
                 <li class="drawer-option selected-tab" onClick="changeTab('home')" id="tab-home"><i class="material-icons">home</i></li>
+                <li class="drawer-option" onClick="changeTab('progress')" id="tab-progress"><i class="material-icons">check</i></li>
                 <li class="drawer-option" onClick="changeTab('calendar')" id="tab-calendar"><i class="material-icons">date_range</i></li>
                 <li class="drawer-option" onClick="changeTab('settings')" id="tab-settings"><i class="material-icons">settings</i></li>
                 <li class="drawer-option" onClick="changeTab('preview')" id="tab-preview"><i class="material-icons">camera</i></li>
@@ -17,7 +18,25 @@
         </div>
         <div id="content-container">
             <div id="home">
-                
+                <div id="visualization-container">
+                    <div class="ban-container">
+                        <viz class="ban" id="hoursStanding"></viz>
+                        <viz class="ban" id="hoursWorked"></viz>
+                        <viz class="ban" id="hoursLeftToEOD"></viz>
+                    </div>
+                    <div class="graph-container">
+                        <viz class="donut" id="workProgress"></viz>
+                        <viz class="donut" id="standProgress"></viz>
+                        <viz class="bar" id="breaksTaken"></viz>
+                    </div>
+                    <div class="timeline-container">
+                        <viz class="timeline" id="timeline"></viz>
+                    </div>
+                </div>
+            </div>
+            <div id="progress">
+                <h1>Goal Progress</h1>
+                <div id="goal-progress-container"></div>
             </div>
             <div id="calendar">
                 <h1>Schedule</h1>
@@ -35,14 +54,18 @@
                 <h1>Camera Preview</h1>
                 <div class="card-primary">
                     <div id="capture-wrapper">
-                        <video id="video-capture" autoplay="true"></video>
-                        <canvas id="canvas-capture"></canvas>
+			            <video id="video-capture" autoplay="true"></video>
+			            <canvas id="canvas-capture"></canvas>
                         <img id="img-capture" />
                     </div>
                 </div>
             </div>
         </div>
-        <script src="./renderer.js"></script>
+        <div id="audio-container"></div>
+        <script src="./src/store.js"></script>
+        <script src="./src/schedule.js"></script>
+        <script src="./src/settings.js"></script>
+        <script src="./src/capture.js"></script>
         <script src="./index.js"></script>
     </body>
 </html>
