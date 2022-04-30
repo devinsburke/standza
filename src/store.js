@@ -39,7 +39,7 @@ class Day
 	}
 
 	toDatetimeRange(datetime) {
-		const prefix = new Date(datetime).toLocaleDateString('en-CA')
+		const prefix = datetime.toLocaleDateString('en-CA')
 		const start = `${prefix} ${this.StartTime}`
 		const end = `${prefix} ${this.EndTime}`
 		return [start, end]
@@ -49,7 +49,7 @@ class Day
 		if (!this.Enabled || !this.StartTime || !this.EndTime)
 			return false
 		const [start, end] = this.toDatetimeRange(datetime)
-		return new Date(datetime) >= start && new Date(datetime) <= end
+		return datetime >= start && datetime <= end
 	}
 }
 
@@ -76,13 +76,18 @@ class Schedule
 	}
 
 	resolveDayFromDate(datetime) {
-		const dayName = new Date(datetime).toLocaleDateString('en-CA', { weekday: 'long' })
+		const dayName = datetime.toLocaleDateString('en-CA', { weekday: 'long' })
 		return this.Days.find(d => d.Name == dayName)
 	}
 
 	isScheduledAt(datetime) {
 		const day = this.resolveDayFromDate(datetime)
 		return day && day.isScheduledAt(date)
+	}
+
+	isScheduledOn(date) {
+		const day = this.resolveDayFromDate(date)
+		return day && day.Enabled
 	}
 
 	toDatetimeRange(datetime) {
@@ -103,47 +108,12 @@ class Schedule
 
 class Condition
 {
-	#function;
-	#arguments;
-	#operator;
-	#comparison;
+	Function
+	Arguments
+	Operator
+	Comparison
 
-	constructor(data)
-	{
-		Object.defineProperties(this, {
-			Function: {
-				get: () => this.#function,
-				set: (value) => this.#function = value
-			},
-			Arguments: {
-				get: () => this.#arguments,
-				set: (value) => this.#arguments = value
-			},
-			Operator: {
-				get: () => this.#operator,
-				set: (value) => this.#operator = value
-			},
-			Comparison: {
-				get: () => this.#comparison,
-				set: (value) => this.#comparison = value
-			}
-		});
-
-		Object.assign(this, data);
-	}
-
-	run(functionContainer) {
-		const fn = functionContainer[this.Function]
-		const val = fn(this.Arguments)
-		switch (this.Operator) {
-			case "equal":
-				return val == this.Comparison
-			case "greaterThanOrEqual":
-				return val >= this.Comparison
-			case "greaterThanOrEqual":
-				return val <= this.Comparison
-		}
-	}
+	constructor(data) { Object.assign(this, data) }
 }
 
 class Trigger
@@ -170,102 +140,31 @@ class Trigger
 			},
 			Conditions: {
 				get: () => this.#conditions,
-				set: (value) => this.#conditions = value ? value.map(x => new Condition(x)) : []
+				set: (value) => this.#conditions = value.map(x => new Condition(x))
 			}
 		});
 
 		Object.assign(this, data);
-	}
-
-	run(functionContainer) {
-		for (const c of this.Conditions) {
-			if (!c.run(functionContainer))
-				return false
-		}
-		// TODO: Alerts
-		return true
 	}
 }
 
 class Goal
 {
-	#label;
-	#description;
-	#sort;
-	#triggers;
+	Label
+	Description
+	Sort
+	Triggers
 
-	constructor(data)
-	{
-		Object.defineProperties(this, {
-			Label: {
-				get: () => this.#label,
-				set: (value) => this.#label = value
-			},
-			Description: {
-				get: () => this.#description,
-				set: (value) => this.#description = value
-			},
-			Sort: {
-				get: () => this.#sort,
-				set: (value) => this.#sort = value
-			},
-			Triggers: {
-				get: () => this.#triggers,
-				set: (value) => this.#triggers = value
-			}
-		});
-
-		Object.assign(this, data);
-	}
-
-	run(triggerDefinitions, functionContainer, skipTriggers) {
-		for (const [_, t] of Object.entries(this.Triggers)) {
-			if (!skipTriggers.includes(t)) {
-				const trigger = triggerDefinitions[t]
-				if (trigger.run(functionContainer)) {
-					skipTriggers.push(t)
-					return [t, trigger]
-				}
-			}
-		}
-	}
+	constructor(data) { Object.assign(this, data) }
 }
 
 class Parameter
 {
-	#label;
-	#datatype;
-	#default_value;
-	#default_interval;
-	#goals;
+	Label
+	DefaultValue
+	DefaultInterval
 
-	constructor(data)
-	{
-		Object.defineProperties(this, {
-			Label: {
-				get: () => this.#label,
-				set: (value) => this.#label = value
-			},
-			DataType: {
-				get: () => this.#datatype,
-				set: (value) => this.#datatype = value
-			},
-			DefaultValue: {
-				get: () => this.#default_value,
-				set: (value) => this.#default_value = value
-			},
-			DefaultInterval: {
-				get: () => this.#default_interval,
-				set: (value) => this.#default_interval = value
-			},
-			Goals: {
-				get: () => this.#goals,
-				set: (value) => this.#goals = value ? value.map(v => new Goal(v)) : []
-			}
-		});
-
-		Object.assign(this, data);
-	}
+	constructor(data) { Object.assign(this, data) }
 }
 
 class AppConfiguration
