@@ -1,100 +1,93 @@
 {
   "Parameters": {
     "work_day_minimum": {
-      "Label": "Required work hours per day",
-      "DataType": "timespan",
+      "Label": "Required work time per day",
       "DefaultValue": "8",
-      "DefaultInterval": "hour"
+      "DefaultInterval": "Hour"
     },
     "away_frequency": {
       "Label": "Desired break frequency",
-      "DataType": "timespan",
       "DefaultValue": "2",
-      "DefaultInterval": "hour"
+      "DefaultInterval": "Hour"
     },
     "away_now_maximum": {
       "Label": "Desired break length",
-      "DataType": "timespan",
       "DefaultValue": "15",
-      "DefaultInterval": "minute"
+      "DefaultInterval": "Minute"
     },
     "stand_day_minimum": {
-      "Label": "Desired hours standing per day",
-      "DataType": "timespan",
+      "Label": "Desired time standing per day",
       "DefaultValue": "8",
-      "DefaultInterval": "hour"
+      "DefaultInterval": "Hour"
     },
     "stand_frequency": {
       "Label": "Desired standing frequency",
-      "DataType": "timespan",
       "DefaultValue": "2",
-      "DefaultInterval": "hour"
+      "DefaultInterval": "Hour"
     },
     "stand_now_maximum": {
       "Label": "Desired standing duration",
-      "DataType": "timespan",
       "DefaultValue": "2",
-      "DefaultInterval": "hour"
+      "DefaultInterval": "Hour"
     }
   },
-
   "Triggers": {
     "worked-day-minimum": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "equal",
           "Comparison": true
         },
         {
           "Function": "daily_time",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "greaterThanOrEqual",
           "Comparison": "work_day_minimum"
         }
       ],
-      "Alert": "Congratulations! You have finished your {work_day_minimum} work day.",
-      "Targets": ["away"],
+      "Alert": "Congratulations! You have finished your work day.",
+      "Targets": ["Absent"],
       "Achieves": []
     },
     "stood-day-minimum": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing"],
           "Operator": "equal",
           "Comparison": true
         },
         {
           "Function": "daily_time",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "greaterThanOrEqual",
           "Comparison": "stand_day_minimum"
         }
       ],
       "Alert": "Congratulations! You have stood for at least {stand_day_minimum}. You may now sit down.",
-      "Targets": ["stand", "sit"],
+      "Targets": ["Sitting"],
       "Achieves": []
     },
     "cannot-work-day-minimum": {
       "Conditions": [
         {
           "Function": "maximum_daily_time",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "lessThanOrEqual",
           "Comparison": "work_day_minimum"
         }
       ],
-      "Alert": "Attention. You will not finish working by {day_end_time} unless you stay at your desk for the rest of the day.",
-      "Targets": ["stand", "sit"],
+      "Alert": "Attention. You will not finish working by the end of the day unless you stay at your desk for the rest of the day.",
+      "Targets": ["Standing", "Sitting"],
       "Achieves": []
     },
     "failed-work-day-minimum": {
       "Conditions": [
         {
           "Function": "daily_time",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "lessThanOrEqual",
           "Comparison": "work_day_minimum"
         },
@@ -105,21 +98,21 @@
           "Comparison": "now"
         }
       ],
-      "Alert": "Attention. It is now after {day_end_time} but you have not worked a full {work_day_minimum}. If you continue working, you will be notified when they are met.",
-      "Targets": ["stand", "sit"],
+      "Alert": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when they are met.",
+      "Targets": ["Standing", "Sitting"],
       "Achieves": []
     },
     "failed-stand-day-minimum": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "equal",
           "Comparison": true
         },
         {
           "Function": "daily_time",
-          "Arguments": ["stand"],
+          "Arguments": ["Standing"],
           "Operator": "lessThanOrEqual",
           "Comparison": "stand_day_minimum"
         },
@@ -130,15 +123,15 @@
           "Comparison": "now"
         }
       ],
-      "Alert": "Attention. It is now after {day_end_time} but you have not stood for a full {stand_day_minimum}. If you continue standing while working, you will be notified when you have stood the full duration.",
-      "Targets": ["away", "stand", "sit"],
+      "Alert": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration.",
+      "Targets": ["Absent", "Standing", "Sitting"],
       "Achieves": []
     },
     "end-day-clock": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "equal",
           "Comparison": true
         },
@@ -149,103 +142,103 @@
           "Comparison": "now"
         }
       ],
-      "Alert": "Congratulations, it is now after {day_end_time}. That means your work day is over.",
-      "Target": ["away"],
+      "Alert": "Congratulations, it is now after hours. That means your work day is over.",
+      "Targets": ["Absent"],
       "Achieves": []
     },
     "stand-now-timer": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["sit"],
+          "Arguments": ["Sitting"],
           "Operator": "equal",
           "Comparison": true
         },
         {
           "Function": "time_since",
-          "Arguments": ["stand"],
+          "Arguments": ["Standing"],
           "Operator": "greaterThanOrEqual",
           "Comparison": "stand_frequency"
         }
       ],
-      "Alert": "You have been sitting for at least {stand_frequency}. You should now switch to standing.",
-      "Targets": ["stand"],
+      "Alert": "It's time to stand!",
+      "Targets": ["Standing"],
       "Achieves": []
     },
     "stand-now-maximum": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand"],
+          "Arguments": ["Standing"],
           "Operator": "equal",
           "Comparison": true
         },
         {
           "Function": "time_since",
-          "Arguments": ["sit"],
+          "Arguments": ["Sitting"],
           "Operator": "greaterThanOrEqual",
           "Comparison": "stand_maximum"
         }
       ],
-      "Alert": "You have been standing for at least {stand_maximum}, and you may now sit down.",
-      "Targets": ["stand", "sit"],
+      "Alert": "You may now sit down.",
+      "Targets": ["Standing", "Sitting"],
       "Achieves": []
     },
     "cannot-stand-day-minimum": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "equal",
           "Comparison": true
         },
         {
           "Function": "maximum_daily_time",
-          "Arguments": ["stand"],
+          "Arguments": ["Standing"],
           "Operator": "lessThanOrEqual",
           "Comparison": "stand_day_minimum"
         }
       ],
-      "Alert": "Attention. You will not reach your goal of standing for {stand_day_minimum} by {day_end_time} unless you stand the rest of the day.",
-      "Targets": ["stand"],
+      "Alert": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day.",
+      "Targets": ["Absent"],
       "Achieves": []
     },
     "away-now-timer": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "equal",
           "Comparison": true
         },
         {
           "Function": "time_since",
-          "Arguments": ["away"],
+          "Arguments": ["Absent"],
           "Operator": "greaterThanOrEqual",
           "Comparison": "away_frequency"
         }
       ],
-      "Alert": "You have been at your desk for at least {away_frequency}. You should now walk away and take a break.",
-      "Targets": ["away"],
+      "Alert": "It's time to take a break!",
+      "Targets": ["Absent"],
       "Achieves": []
     },
     "away-now-maximum": {
       "Conditions": [
         {
           "Function": "is_state",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "equal",
           "Comparison": false
         },
         {
           "Function": "time_since",
-          "Arguments": ["stand", "sit"],
+          "Arguments": ["Standing", "Sitting"],
           "Operator": "greaterThanOrEqual",
           "Comparison": "away_now_maximum"
         }
       ],
-      "Alert": "Attention. You have been away for at least {away_now_maximum}. You should now return to your desk.",
-      "Targets": ["stand", "sit"],
+      "Alert": "Attention. You should now return to your desk.",
+      "Targets": ["Standing", "Sitting"],
       "Achieves": []
     }
   },
