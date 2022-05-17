@@ -40,8 +40,8 @@ class Day
 
 	toDatetimeRange(datetime) {
 		const prefix = datetime.toLocaleDateString('en-CA')
-		const start = `${prefix} ${this.StartTime}`
-		const end = `${prefix} ${this.EndTime}`
+		const start = new Date(`${prefix} ${this.StartTime}`)
+		const end = new Date(`${prefix} ${this.EndTime}`)
 		return [start, end]
 	}
 
@@ -215,6 +215,8 @@ class AppConfiguration
 
 class UserConfiguration
 {
+	#refreshInterval;
+	#stateChangeTolerance;
 	#schedule;
 	#goals;
 	#parameters;
@@ -223,6 +225,14 @@ class UserConfiguration
 	constructor(data)
 	{
 		Object.defineProperties(this, {
+			RefreshInterval: {
+				get: () => this.#refreshInterval,
+				set: (value) => this.#refreshInterval = value
+			},
+			StateChangeTolerance: {
+				get: () => this.#stateChangeTolerance,
+				set: (value) => this.#stateChangeTolerance = value
+			},
 			Schedule: {
 				get: () => this.#schedule,
 				set: (value) => this.#schedule = new Schedule(value)
@@ -253,6 +263,8 @@ class UserConfiguration
 	
 	#toStorageJson() {
 		return JSON.stringify({
+			RefreshInterval: this.RefreshInterval,
+			StateChangeTolerance: this.StateChangeTolerance,
 			Schedule: this.Schedule.toStorageJson(),
 			Goals: this.Goals,
 			Parameters: this.Parameters
