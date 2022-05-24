@@ -1,0 +1,44 @@
+{
+	"Visualizations": [
+		{
+			"Type": "BAN",
+			"ContainerId": "hoursStanding",
+			"Params": ["Hour(s) Standing", "Hours Standing"]
+		},
+		{
+			"Type": "BAN",
+			"ContainerId": "hoursWorked",
+			"Params": ["Hour(s) Worked", "Hours Working"]
+		},
+		{
+			"Type": "BAN",
+			"ContainerId": "hoursLeftToEOD",
+			"Params": ["Hour(s) Left to End of Day", "Day Hours Remaining"]
+		},
+		{
+			"Type": "Donut",
+			"ContainerId": "workProgress",
+			"Params": ["Work Day Progress", "Hours", ["Hours Working", "Work Hours Remaining"]]
+		},
+		{
+			"Type": "Donut",
+			"ContainerId": "standProgress",
+			"Params": ["Stand Progress", "Hours", ["Hours Standing", "Stand Hours Remaining"]]
+		},
+		{
+			"Type": "Bar",
+			"ContainerId": "breaksTaken",
+			"Params": ["Breaks Taken", "Breaks Taken", "Maximum Break Time"]
+		},
+		{
+			"Type": "State",
+			"ContainerId": "stateTimer",
+			"Params": ["Current State", "Raw State"]
+		},
+		{
+			"Type": "Clock",
+			"ContainerId": "currentTime",
+			"Params": []
+		}
+	]
+}
