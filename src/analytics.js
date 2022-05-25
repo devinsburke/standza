@@ -10,45 +10,37 @@ const vizPalette = [
 
 class BAN 
 {
-	constructor(domContainer, name, valueKey) 
+	constructor(domContainer, [name, valueKey]) 
 	{
-		this.Type = 'BAN'
 		this.Name = name
 		this.ValueKey = valueKey
-		this.ValueElement = document.createElement('h3')
-		this.NameElement = document.createElement('span')
-		domContainer.appendChild(this.ValueElement)
-		domContainer.appendChild(this.NameElement)
-		domContainer.classList.add(vizRenderClass)
+		this.Element = domContainer
 	}
 	
 	redraw(data) {
-		this.NameElement.textContent = this.Name
-		this.ValueElement.textContent = data[this.ValueKey].toFixed(2)
+		this.Element.setAttribute('data-name', this.Name)
+		this.Element.setAttribute('data-value', data[this.ValueKey].toFixed(2))
 	}
 }
 
 class Donut 
 {	
-	constructor(domContainer, name, unit, valueKeys, values)
+	constructor(domContainer, [name, unit, valueKeys])
 	{
-		this.Type = 'Donut'
 		this.Name = name
 		this.Unit = unit
-		this.ValueKeys = valueKeys ?? []
+		this.ValueKeys = valueKeys
+		this.Element = domContainer
 		
 		this.LabelElement = document.createElement('label')
-		this.NameElement = document.createElement('span')
 		this.DonutElement = document.createElement('donut')
 		this.DonutElement.appendChild(this.LabelElement)
-		domContainer.appendChild(this.NameElement)
 		domContainer.appendChild(this.DonutElement)
-		domContainer.classList.add(vizRenderClass)
 		d3.select(this.DonutElement).append('svg').append('g')
 	}
 	
 	redraw(data) {
-		const values = this.ValueKeys.map(k => data[k])
+		const [current, remaining] = this.ValueKeys.map(k => data[k])
 		const size = Math.min(
 			this.DonutElement.offsetHeight,
 			this.DonutElement.offsetWidth
@@ -60,91 +52,35 @@ class Donut
 				.attr('height', size)
 			.select('g')
 			.selectAll('path')
-			.data(d3.pie()(values))
+			.data(d3.pie()([current, remaining]))
 			.join('path')
-				.attr('d', d3.arc().innerRadius(70).outerRadius(size/2))
+				.attr('d', d3.arc().innerRadius(size/4).outerRadius(size/2))
 				.attr('fill', (_, i) => vizPalette[i])
 
-		this.NameElement.textContent = this.Name
-		this.LabelElement.setAttribute('data-current', values[0].toFixed(2))
-		this.LabelElement.setAttribute('data-total', (values[0] + values[1]).toFixed(2))
+		this.Element.setAttribute('data-name', this.Name)
+		this.LabelElement.setAttribute('data-current', current.toFixed(2))
+		this.LabelElement.setAttribute('data-total', (current + remaining).toFixed(2))
 		this.LabelElement.setAttribute('data-unit', this.Unit)
 	}
 }
 
 class Bar 
 {
-	#name;
-	#element;
-	#valueKey;
-	#values;
-	#errorKey;
-	#errorValue;
-	
-	constructor(domContainer, name, valueKey, errorThresholdKey, data)
+	constructor(domContainer, [name, valueKey, errorKey])
 	{
-		Object.defineProperties(this, {
-			Type: {
-				get: function() {
-					return 'Bar';
-				}
-			},
-			Element: {
-				get: function() {
-					return this.#element;
-				}
-			},
-			Name: {
-				get: function() {
-					return this.#name;
-				},
-				set: function(value) {
-					this.#name = value;
-				}
-			},
-			ValueKey: {
-				get: function() {
-					return this.#valueKey;
-				},
-				set: function(value) {
-					this.#valueKey = value;
-				}
-			},
-			Values: {
-				get: function() {
-					return this.#values;
-				},
-				set: function(value) {
-					this.#values = value;
-				}
-			},
-			ErrorKey: {
-				get: function() {
-					return this.#errorKey;
-				},
-				set: function(value) {
-					this.#errorKey = value;
-				}
-			},
-			ErrorValue: {
-				get: function() {
-					return this.#errorValue;
-				},
-				set: function(value) {
-					this.#errorValue = value;
-				}
-			}
-		});
+		this.Element = domContainer
+		this.Name = name
+		this.ValueKey = valueKey
+		this.ErrorKey = errorKey
+		this.Values = {}
 		
-		this.#element = domContainer;
-		this.#name = name;
-		this.#valueKey = valueKey;
-		this.#values = data[this.#valueKey];
-		this.#errorKey = errorThresholdKey;
-		if (errorThresholdKey != null)
-			this.#errorValue = data[this.#errorKey];
-		
-		this.#draw();
+		var nameElement = document.createElement('span');
+		nameElement.textContent = this.Name;
+		this.Element.appendChild(nameElement);
+		var containerElement = document.createElement('bar');
+		containerElement.id = this.Element.id + '-bar';
+		this.Element.appendChild(containerElement);
+		this.#createBar();
 	}
 	
 	redraw(visualizationData) {
@@ -155,24 +91,14 @@ class Bar
 		var bar = this.Element.querySelectorAll('bar')[0];
 		var svg = bar.querySelectorAll('svg')[0];
 		svg.remove();
-		this.#createBar(bar);
+		this.#createBar();
 
 		var s = this.Element.querySelectorAll('svg')[0];
 		if (Object.entries(this.Values).length != 0)
 			s.classList.remove('hidden');
 	}
 	
-	#draw() {
-		var nameElement = document.createElement('span');
-		nameElement.textContent = this.Name;
-		this.Element.appendChild(nameElement);
-		var containerElement = document.createElement('bar');
-		containerElement.id = this.Element.id + '-bar';
-		this.Element.appendChild(containerElement);
-		this.#createBar(containerElement);
-	}
-	
-	#createBar(containerElement) {
+	#createBar() {
 		var bar = this.Element.querySelectorAll('bar')[0];
 		var height = bar.offsetHeight - 50;
 		var width = bar.offsetWidth;
@@ -239,284 +165,70 @@ class Bar
 
 class State 
 {
-	#element;
-	#state;
-	#stateKey;
-	#matchState;
-	#matchStateKey;
-	#stateSeconds = 0;
-	
-	constructor(domContainer, stateKey, matchStateKey, data)
+	constructor(domContainer, [stateKey, matchStateKey])
 	{
-		Object.defineProperties(this, {
-			Type: {
-				get: function() {
-					return 'State';
-				}
-			},
-			Element: {
-				get: function() {
-					return this.#element;
-				}
-			},
-			StateKey: {
-				get: function() {
-					return this.#stateKey;
-				},
-				set: function(value) {
-					this.#stateKey = value;
-				}
-			},
-			MatchStateKey: {
-				get: function() {
-					return this.#matchStateKey;
-				},
-				set: function(value) {
-					this.#matchStateKey = value;
-				}
-			},
-			State: {
-				get: function() {
-					return this.#state;
-				},
-				set: function(value) {
-					this.#state = value;
-				}
-			},
-			MatchState: {
-				get: function() {
-					return this.#matchState;
-				},
-				set: function(value) {
-					this.#matchState = value;
-				}
-			},
-			StateSeconds: {
-				get: function() {
-					return this.#stateSeconds;
-				},
-				set: function(value) {
-					this.#stateSeconds = value;
-				}
-			}
-		});
+		this.StateKey = stateKey
+		this.MatchStateKey = matchStateKey
+		this.StateSeconds = 0
+		this.Element = domContainer
 		
-		this.#stateKey = stateKey;
-		this.#matchStateKey = matchStateKey;
-		this.#state = data[stateKey];
-		if (this.#matchStateKey != null)
-			this.#matchState = data[this.#matchStateKey];
-		this.#element = domContainer;	
-		this.#draw();
+		this.StateElement = document.createElement('span')
+		this.StateElement.classList.add('state')
+		this.TimerElement = document.createElement('timer')
+		domContainer.appendChild(this.StateElement)
+		domContainer.appendChild(this.TimerElement)
+		domContainer.classList.add(vizRenderClass)
+
+		setInterval(() => this.updateState(), 1000)
 	}
 	
-	async updateState() {
-		this.StateSeconds++;
-		this.Element.querySelectorAll('span.state')[0].textContent = this.State;
+	updateState() {
+		this.StateElement.textContent = this.State
 		if (this.State != this.MatchState)
-			this.Element.classList.add('state-changed');
-		else 
-			this.Element.classList.remove('state-changed');
-		var minutes = Math.floor(this.StateSeconds / 60);
-		var seconds = this.StateSeconds - (minutes * 60);
-		if (minutes == 0)
-			this.Element.querySelectorAll('timer')[0].textContent = String(this.StateSeconds) + ' second(s)';
-		else 
-			this.Element.querySelectorAll('timer')[0].textContent = String(minutes) + ' minute(s) ' + String(seconds) + ' second(s)';
+			this.Element.classList.add('state-changed')
+		else
+			this.Element.classList.remove('state-changed')
+		this.TimerElement.textContent = new Date(++this.StateSeconds * 1000).toISOString().substring(11, 19)
 	}
 	
-	async #resetState() {
-		setInterval(function() {
-			window.visualizationManager.updateStates();
-		}, 1000);
-	}
-	
-	redraw(visualizationData) {
-		if (this.MatchStateKey != null)
-			this.MatchState = visualizationData[this.MatchStateKey];
-		if (this.State == visualizationData[this.StateKey])
-			return;
-		this.State = visualizationData[this.StateKey];
-		this.StateSeconds = 0;
-	}
-	
-	#draw() {
-		var stateElement = document.createElement('span');
-		stateElement.textContent = this.State;
-		stateElement.classList.add('state');
-		this.Element.appendChild(stateElement);
-		var timerElement = document.createElement('timer');
-		timerElement.id = this.Element.id + '-timer';
-		timerElement.textContent = '0 second(s)';
-		this.Element.appendChild(timerElement);
-		this.Element.classList.add(vizRenderClass);
+	redraw(data) {
+		
+
+		this.MatchState = data[this.MatchStateKey]
+		if (this.State != data[this.StateKey]) {
+			this.State = data[this.StateKey]
+			this.StateSeconds = 0
+		}
 	}
 }
 
 class Clock
 {
-	#element;
-	
 	constructor(domContainer) {
-		Object.defineProperties(this, {		
-			Type: {
-				get: function() {
-					return 'Clock';
-				}
-			},
-			Element: {
-				get: function() {
-					return this.#element;
-				}
-			}
-		});
-		
-		this.#element = domContainer;
-		this.#draw();
-	}
-	
-	updateState() {
-		var clockElement = this.Element.querySelectorAll('span')[0];
-		clockElement.textContent = getNow().toLocaleTimeString();
-	}
-	
-	async #resetState() {
-		setInterval(function() {
-			window.visualizationManager.updateStates();
-		}, 1000);
-	}
-	
-	#draw() {
-		var clockElement = document.createElement('span');
-		clockElement.textContent = new Date().toLocaleTimeString();
-		this.Element.appendChild(clockElement);
-		this.Element.classList.add(vizRenderClass);
-		this.#resetState();
-	}
+		this.ClockElement = document.createElement('span')
+		domContainer.appendChild(this.ClockElement)
+		domContainer.classList.add(vizRenderClass)
 
-	redraw(visualizationData) {}
+		setInterval(() => this.ClockElement.textContent = getNow().toLocaleTimeString(), 1000)
+	}
+	
+	redraw(data) {}
 }
 
 class VisualizationManager
 {
-	#data;
-	#visuals = [];
-	#configPath;
-	
-	constructor(configPath) 
-	{		
-		Object.defineProperties(this, {
-			Visuals: {
-				get: function() {
-					return this.#visuals;
-				}
-			},
-			Data: {
-				set: function(value) {
-					if (this.#data == null && value != null)
-					{
-						this.#data = value;
-						if (configPath != null)
-							this.#fromJson(this.#configPath);
-					}
-					this.#data = value;					
-					this.Visuals.forEach(v => {
-						v.redraw(this.#data['Data Points']);
-					});
-					this.#updateGoalProgress();
-				}
-			}
-		});
+	#vizClasses = {BAN, Donut, Bar, State, Clock}
 
-		this.#configPath = configPath;
+	constructor(vizConfig) 
+	{
+		this.visualizations = vizConfig.map(v => {
+			const el = document.getElementById(v.ContainerId)
+			return new this.#vizClasses[v.Type](el, v.Params)
+		})
 	}
-	
-	async #fromJson(jsonPath) {
-		var response = await fetch(jsonPath)
-		var jsn = await response.json();			
-		(jsn['Visualizations'] ?? []).forEach(v => {
-			this.#initViz(v);
-		});
-	}
-	
-	#updateGoalProgress() {
-		var container = document.getElementById('goal-progress-container');
-		Object.entries(this.#data['Goal Progress']).forEach(x => {
-			var goalElement = document.getElementById(x[0]);
-			if (goalElement == null) {
-				goalElement = document.createElement('viz');
-				goalElement.classList.add('metric');
-				var icon = document.createElement('i');
-				icon.classList.add('material-icons');
-				goalElement.appendChild(icon);
-				var description = document.createElement('span');
-				description.textContent = x[0];
-				goalElement.appendChild(description);
-				container.appendChild(goalElement);
-			}
-			var goalIcon = goalElement.querySelectorAll('i')[0];
-			if (x[1] == 'In Progress') {
-				goalIcon.textContent = 'label_important';
-				goalElement.classList.remove('failure');
-				goalElement.classList.remove('success');
-			}
-			else if (x[1] == 'Completed') {
-				goalIcon.textContent = 'done';
-				goalElement.classList.remove('failure');
-				goalElement.classList.add('success');
-			}
-			else if (x[1] == 'Failed') {
-				goalIcon.textContent = 'dangerous';
-				goalElement.classList.add('failure');
-				goalElement.classList.remove('success');
-			}
-			if (x[1] == 'Disabled') {
-				goalIcon.textContent = 'unpublished';
-				goalElement.classList.add('disabled');
-				goalElement.classList.remove('failure');
-				goalElement.classList.remove('success');	
-			}
-			goalElement.classList.add('rendered');
-		});
-	}
-	
-	#initViz(config) {
-		if (config.Type == 'BAN')
-			this.#visuals.push(new BAN(document.getElementById(config.ContainerId), config.Params[0], config.Params[1], this.#data['Data Points']));
-		if (config.Type == 'Donut')
-			this.#visuals.push(new Donut(document.getElementById(config.ContainerId), config.Params[0], config.Params[1], config.Params[2], this.#data['Data Points']));
-		if (config.Type == 'Bar')
-			this.#visuals.push(new Bar(document.getElementById(config.ContainerId), config.Params[0], config.Params[1], config.Params[2], this.#data['Data Points']));
-		if (config.Type == 'State')
-			this.#visuals.push(new State(document.getElementById(config.ContainerId), config.Params[0], config.Params[1], this.#data['Data Points']));
-		if (config.Type == 'Clock')
-			this.#visuals.push(new Clock(document.getElementById(config.ContainerId)));
-	}
-	
-	createBAN(domContainerId, name, valueKey) {		
-		this.#visuals.push(new BAN(document.getElementById(domContainerId), name, valueKey, this.#data['Data Points']));
-	}
-	
-	createDonut(domContainerId, name, unit, valueKeys) {
-		this.#visuals.push(new Donut(document.getElementById(domContainerId), name, unit, valueKeys, this.#data['Data Points']));
-	}
-	
-	createBarChart(domContainerId, name, valueKey, errorThresholdKey) {
-		this.#visuals.push(new Bar(document.getElementById(domContainerId), name, valueKey, errorThresholdKey, this.#data['Data Points']));
-	}
-	
-	async createState(domContainerId, stateKey) {
-		this.#visuals.push(new State(document.getElementById(domContainerId), stateKey, this.#data['Data Points']));
-	}
-	
-	async createClock(domContainerId) {
-		this.#visuals.push(new Clock(document.getElementById(domContainerId)));
-	}
-	
-	async updateStates() {
-		this.#visuals.forEach(v => {
-			if (v.Type == 'State' || v.Type == 'Clock')
-				v.updateState();
-		});
+
+	setData(data) {
+		this.visualizations.forEach(v => v.redraw(data['Data Points']))
+		//this.#updateGoalProgress()
 	}
 }
