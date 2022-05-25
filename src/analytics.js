@@ -32,7 +32,7 @@ class Donut
 		this.ValueKeys = valueKeys
 		this.Element = domContainer
 		
-		this.LabelElement = document.createElement('label')
+		this.LabelElement = document.createElement('span')
 		this.DonutElement = document.createElement('donut')
 		this.DonutElement.appendChild(this.LabelElement)
 		domContainer.appendChild(this.DonutElement)
@@ -165,54 +165,40 @@ class Bar
 
 class State 
 {
-	constructor(domContainer, [stateKey, matchStateKey])
+	constructor(domContainer, [assumedStateKey, rawStateKey])
 	{
-		this.StateKey = stateKey
-		this.MatchStateKey = matchStateKey
-		this.StateSeconds = 0
 		this.Element = domContainer
-		
-		this.StateElement = document.createElement('span')
-		this.StateElement.classList.add('state')
-		this.TimerElement = document.createElement('timer')
-		domContainer.appendChild(this.StateElement)
-		domContainer.appendChild(this.TimerElement)
-		domContainer.classList.add(vizRenderClass)
-
-		setInterval(() => this.updateState(), 1000)
-	}
-	
-	updateState() {
-		this.StateElement.textContent = this.State
-		if (this.State != this.MatchState)
-			this.Element.classList.add('state-changed')
-		else
-			this.Element.classList.remove('state-changed')
-		this.TimerElement.textContent = new Date(++this.StateSeconds * 1000).toISOString().substring(11, 19)
+		this.AssumedStateKey = assumedStateKey
+		this.RawStateKey = rawStateKey
+		this.Seconds = 0
+		setInterval(() => this.redraw(), 1000)
 	}
 	
 	redraw(data) {
-		
-
-		this.MatchState = data[this.MatchStateKey]
-		if (this.State != data[this.StateKey]) {
-			this.State = data[this.StateKey]
-			this.StateSeconds = 0
+		if (data) {
+			this.RawState = data[this.RawStateKey]
+			if (this.AssumedState != data[this.AssumedStateKey]) {
+				this.AssumedState = data[this.AssumedStateKey]
+				this.Seconds = 0
+			}
 		}
+		this.Element.classList.toggle('state-changed', this.AssumedState != this.RawState)
+		this.Element.setAttribute('data-assumed-state', this.AssumedState)
+		this.Element.setAttribute('data-raw-state', this.RawState)
+		this.Element.setAttribute('data-time', dateutil.toHMS(++this.Seconds * 1000))
 	}
 }
 
 class Clock
 {
 	constructor(domContainer) {
-		this.ClockElement = document.createElement('span')
-		domContainer.appendChild(this.ClockElement)
-		domContainer.classList.add(vizRenderClass)
-
-		setInterval(() => this.ClockElement.textContent = getNow().toLocaleTimeString(), 1000)
+		this.Element = domContainer
+		setInterval(() => this.redraw(), 1000)
 	}
 	
-	redraw(data) {}
+	redraw(data) {
+		this.Element.setAttribute('data-time', getNow().toLocaleTimeString())
+	}
 }
 
 class VisualizationManager
@@ -229,6 +215,5 @@ class VisualizationManager
 
 	setData(data) {
 		this.visualizations.forEach(v => v.redraw(data['Data Points']))
-		//this.#updateGoalProgress()
 	}
 }

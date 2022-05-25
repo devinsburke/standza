@@ -4,106 +4,95 @@
 }
 	#visualization-container > * {
 		display: flex;
-		flex: 1 1 auto;
-		flex-flow: row;
+		flex: 1 1 0;
 		user-select: none;
 	}
 
 .ban-container {
-	height: 25%;
-	padding-bottom: 5px;
+	height: 16.5%;
 }
-
 .graph-container {
-	height: 50%;
-	padding-bottom: 10px;
+	height: 66%;
+}
+.timeline-container {
+	height: 16.5%;
 }
 
 viz {
+	background: var(--card-background);
+	border-radius: 0.8em;
+	box-shadow: 0 0 0.1em 0 #0000004d;
 	display: flex;
-	flex: auto;
+	flex: 1 1 0;
 	flex-flow: column;
+	margin: 0.3em;
+	padding: 0.5em;
 }
 	viz.ban {
-		background: var(--background-light);
-		border-radius: 10px;
-		margin: 5px;
-		box-shadow: 0px 0px 2px 0px #0000004d;
-		padding: 10px;
 		align-items: center;
+		background: var(--background-light);
 		flex-flow: row;
 	}
 		viz.ban::before {
 			content: attr(data-value);
 			background: rgba(0,0,0,0.3);
-			padding: 10px;
-			height: 75%;
+			padding: 0 0.5em;
+			height: 100%;
 			align-items: center;
 			display: flex;
-			border-radius: 5px;
+			border-radius: 0.3em;
 			font-size: 1.5em;
 		}
 		viz.ban::after {
 			content: attr(data-name);
-			padding-left: 15px;
+			padding-left: 1em;
 		}
 	
 	viz.donut,
 	viz.bar {
 		background: var(--primary-dark);
-		border-radius: 10px;
-		box-shadow: 0px 0px 2px 0px #0000004d;
-		margin: 0.3em;
-		padding: 0.5em;
 	}
-		
 		viz.donut::before,
 		viz.bar > span {
 			content: attr(data-name);
 			display: flex;
 			white-space: pre;
 			background: rgba(200,200,200,0.1);
-			padding: 5px;
-			border-radius: 5px;
+			padding: 0.3em;
+			border-radius: 0.3em;
 			margin-bottom: 0.8em;
 		}
 		
-		donut {
-			align-items: center;
-			position: relative;
-			flex: 1 1 auto;
-		}
-		donut svg {
+	viz.donut donut {
+		align-items: center;
+		position: relative;
+		flex: 1 1 0;
+	}
+		viz.donut donut svg {
 			position: absolute;
 			left: 50%;
 			top: 50%;
 			transform: translate(-50%, -50%);
 		}
-
-	viz.donut donut label {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		display: block;
-		font-size: 12px;
-		text-align: center;
-		padding: 0;
-		margin: 0;
-		justify-content: space-around;
-	}
-	viz.donut donut label::before {
-		content: attr(data-current);
-		display: block;
-		border-bottom-width: 1px;
-		border-bottom-style: solid;
-		padding-bottom: 3px;
-		margin-bottom: 3px;
-	}
-	viz.donut donut label::after {
-		content: attr(data-total) ' ' attr(data-unit);
-		display: block;
-	}
+		viz.donut donut span {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 0.75em;
+			text-align: center;
+		}
+			viz.donut donut span::before {
+			display: block;
+			content: attr(data-current);
+				border-bottom: 1px solid;
+				padding-bottom: 0.2em;
+				margin-bottom: 0.2em;
+			}
+			viz.donut donut span::after {
+				content: attr(data-total) ' ' attr(data-unit);
+				display: block;
+			}
 		
 	donut g {
 		transform: translate(50%, 50%);
@@ -122,36 +111,21 @@ viz {
 		fill: white;
 	}
 	
-	viz.state,
-	viz.clock {
-		max-width: 50%;
-		border-radius: 10px;
-		box-shadow: 0px 0px 2px 0px #0000004d;
-		height: 100%;
-		background: var(--card-background);
-		padding: 15px;
-		flex: 1 1 auto;
-		margin: 5px;
-		margin-top: 0;
+	viz.state.state-changed {
+		color: yellow;
 	}
-
-		viz.state.state-changed {
-			color: yellow;
-		}
-		
-		viz.state > span.state {
-			font-size: 36px;
-			display: block;
-			text-align: center;
-		}
-		
-		viz.state > timer {
-			display: block;
-			text-align: center;
-		}
-		
-	viz.clock > span {
-	    font-size: 48px;
+	viz.state::before {
+		content: attr(data-assumed-state);
+		font-size: 2em;
+		text-align: center;
+	}
+	viz.state::after {
+		content: attr(data-time);
+		text-align: center;
+	}
+	viz.clock::before {
+		content: attr(data-time);
+	    font-size: 3em;
 		display: flex;
 		justify-content: space-around;
 	}
