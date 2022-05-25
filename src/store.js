@@ -118,33 +118,15 @@ class Condition
 
 class Trigger
 {
-	#alert;
-	#targets;
-	#achieves;
-	#conditions;
+	Alert
+	Targets
+	Achieves
+	Conditions
 
 	constructor(data)
 	{
-		Object.defineProperties(this, {
-			Alert: {
-				get: () => this.#alert,
-				set: (value) => this.#alert = value
-			},
-			Targets: {
-				get: () => this.#targets,
-				set: (value) => this.#targets = value
-			},
-			Achieves: {
-				get: () => this.#achieves,
-				set: (value) => this.#achieves = value
-			},
-			Conditions: {
-				get: () => this.#conditions,
-				set: (value) => this.#conditions = value.map(x => new Condition(x))
-			}
-		});
-
-		Object.assign(this, data);
+		Object.assign(this, data)
+		this.Conditions = this.Conditions.map(c => new Condition(c))
 	}
 }
 
@@ -169,47 +151,23 @@ class Parameter
 
 class AppConfiguration
 {
-	#parameters;
-	#triggers;
-	#goals;
-	#path;
+	Visualizations = []
+	Parameters = {}
+	Triggers = {}
+	Goals = {}
 
 	constructor(data)
 	{
-		Object.defineProperties(this, {
-			Parameters: {
-				get: () => this.#parameters,
-				set: (value) => {
-					this.#parameters = {}
-					Object.entries(value).forEach(([k,v]) => this.#parameters[k] = new Parameter(v))
-				}
-			},
-			Triggers: {
-				get: () => this.#triggers,
-				set: (value) => {
-					this.#triggers = {}
-					Object.entries(value).forEach(([k,v]) => this.#triggers[k] = new Trigger(v))
-				}
-			},
-			Goals: {
-				get: () => this.#goals,
-				set: (value) => {
-					this.#goals = {}
-					Object.entries(value).forEach(([k,v]) => this.#goals[k] = new Goal(v))
-				}
-			}
-		});
-
-		Object.assign(this, data);
+		Object.assign(this, data)
+		Object.entries(this.Parameters).forEach(([k, v]) => this.Parameters[k] = new Parameter(v))
+		Object.entries(this.Triggers).forEach(([k, v]) => this.Triggers[k] = new Trigger(v))
+		Object.entries(this.Goals).forEach(([k, v]) => this.Goals[k] = new Goal(v))
 	}
 
 	static async fromJson(jsonPath) {
-		return fetch(jsonPath).then(async response => {
-			var jsn = await response.json();
-			var output = new AppConfiguration(jsn);
-			output.#path = jsonPath;
-			return output;
-		});
+		const response = await fetch(jsonPath)
+		const jsn = await response.json()
+		return new AppConfiguration(jsn)
 	}
 }
 
