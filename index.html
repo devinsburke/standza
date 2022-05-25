@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link href="./styles.css" rel="stylesheet">
+        <link href="./visualizations.css" rel="stylesheet">
         <title>Standza</title>
     </head>
     <body>
@@ -30,7 +31,8 @@
                         <viz class="bar" id="breaksTaken"></viz>
                     </div>
                     <div class="timeline-container">
-                        <viz class="timeline" id="timeline"></viz>
+                        <viz class="state" id="stateTimer"></viz>
+                        <viz class="clock" id="currentTime"></viz>
                     </div>
                 </div>
             </div>
@@ -62,10 +64,16 @@
             </div>
         </div>
         <div id="audio-container"></div>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="./src/store.js"></script>
         <script src="./src/schedule.js"></script>
         <script src="./src/settings.js"></script>
         <script src="./src/capture.js"></script>
+        <script src="./src/audio.js"></script>
+        <script src="./src/rules.js"></script>
+        <script src="./src/activity.js"></script>
+        <script src="./src/state.js"></script>
+        <script src="./src/analytics.js"></script>
         <script src="./index.js"></script>
     </body>
 </html>
