@@ -1,0 +1,14 @@
+{
+    "mainDocument": "index.html",
+    "window": {
+        "autoHideMenuBar": false,
+        "frame": true,
+        "fullScreen": false,
+        "developerTools": true,
+        "externalDisplay": true,
+        "height": 480,
+        "width": 800,
+        "x": null,
+        "y": null
+    }
+}
