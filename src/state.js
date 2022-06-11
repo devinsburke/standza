@@ -1,12 +1,13 @@
 class StateManager {
-    constructor(activityLog, camera, ruleEngine, visualizationManager, refreshInterval) {
+    constructor(activityLog, camera, ruleEngine, visualizationManager, goalParameters, refreshInterval) {
         this.enabled = false
         this.currentState = null
         this.activity = activityLog
         this.camera = camera
-        this.visualizationManager = visualizationManager
-        this.refreshInterval = refreshInterval
         this.ruleEngine = ruleEngine
+        this.visualizationManager = visualizationManager
+        this.goalParameters = goalParameters
+        this.refreshInterval = refreshInterval
     }
 
     async start() {
@@ -27,7 +28,7 @@ class StateManager {
             console.log(`run(): rawState = ${rawState}`)
             if (!this.currentState)
                 this.currentState = rawState
-            this.activity.addMoment(getNow(), rawState, this.currentState)
+            const moment = this.activity.addMoment(getNow(), rawState, this.currentState)
 
             if (this.currentState != rawState) {
                 // Update significance of near-latest entries if appropriate.
@@ -36,52 +37,83 @@ class StateManager {
                 if (this.activity.isMeetSignificance(startIdx)) {
                     this.activity.updateAssumedState(startIdx, endIdx, rawState)
                     this.currentState = rawState
-                    this.ruleEngine.removeTriggerHolds(this.currentState)
                 }
             }
 
-            const activitySummary = this.activity.getSummary()
-            if (this.activity.schedule.isScheduledOn(getNow()))
-                this.ruleEngine.run(activitySummary)
+            const summary = new Summary(
+                moment,
+                this.goalParameters,
+                this.activity.getActivitySummary()
+            )
 
-            this.visualizationManager.setData(activitySummary)
+            // TODO: Handle how rules usually should not run past work time.
+            if (this.activity.schedule.isScheduledOn(getNow()))
+                this.ruleEngine.run(summary)
+
+            this.visualizationManager.setData(summary)
             
             setTimeout((async() => await this.run()), this.refreshInterval)
         }
     }
+}
 
-    // getAnalyticsData() {
-    //     const hoursWorked = this.activity.getMinutesInState(['Standing', 'Sitting']) / 60.00
-    //     const hoursGoal = this.ruleEngine.getParameterInHours('param-work-day-minimum')
-    //     const hoursStood = this.activity.getMinutesInState(['Standing']) / 60.00
-    //     const standGoal = this.ruleEngine.getParameterInHours('param-stand-day-minimum')
-        
-    //     return {
-    //         'Data Points': {
-    //             'Hours Standing': hoursStood,
-    //             'Hours Working': hoursWorked,
-    //             'Day Hours Remaining': this.activity.getMinutesRemainingInDay() / 60.00,
-    //             'Stand Hours Remaining': Math.max(standGoal - hoursStood, 0),
-    //             'Work Hours Remaining': Math.max(hoursGoal - hoursWorked, 0),
-    //             'Maximum Break Time': this.ruleEngine.getParameterInHours('param-absent-now-maximum') * 60.0,
-    //             'Minimum Hours Standing': standGoal,
-    //             'Minimum Hours Working': this.ruleEngine.getParameterInHours('param-work-day-minimum'),
-    //             'Current State': this.activity.getCurrentState(true),
-    //             'Raw State': this.activity.getCurrentState(false),
-    //             'Breaks Taken': this.activity.getStateOccurrences(['Absent']).map(o => {
-    //                 const obj = {}
-    //                 obj[o.timestamp.toLocaleString('en-US', { hour: 'numeric', hour12: true, minute: 'numeric' })] = o.duration
-    //                 return obj
-    //             }),
-    //         },
-    //         'Goal Progress': {
-    //             //'Ensure I work a full day': 'In Progress',
-    //             //'Stop working the earliest I can': 'In Progress',
-    //             //'Stand a minimum amount each day': 'Completed',
-    //             //'Regularly switch to standing': 'Disabled',
-    //             //'Regularly take a break and walk away': 'Failed',
-    //             //'Ensure I am never away too long': 'Failed'
-    //         }
-    //     }
-    // }
+class Summary {
+    constructor(moment, parameters, {states, activity}) {
+        const [dayStart, dayEnd] = moment.day.toDatetimeRange(moment.timestamp)
+        const dayBalance = dayEnd - moment.timestamp
+        this['timestamp'] = moment.timestamp
+        this['activity'] = activity
+
+        this['schedule.day.start'] = dayStart
+        this['schedule.day.end'] = dayEnd
+        this['schedule.day.duration'] = dayEnd - dayStart
+        this['schedule.day.elapsed'] = moment.timestamp - dayStart
+        this['schedule.day.balance'] = dayBalance
+        this['schedule.day.enabled'] = moment.day.Enabled
+
+        for (const s in PersonState) {
+            const info = s in states ? states[s] : {total: 0, last: 0}
+            this[`states.${s.toLowerCase()}.total`] = info.total
+            this[`states.${s.toLowerCase()}.last`] = info.last
+            this[`states.${s.toLowerCase()}.since`] = moment.timestamp - info.last
+            this[`states.${s.toLowerCase()}.potential`] = dayBalance + info.total
+
+            let notTotal = 0
+            let notLast = 0
+            for (const ns in states) {
+                if (ns != s) {
+                    notTotal += states[ns].total
+                    if (notLast < states[ns].last)
+                        notLast = states[ns].last
+                }
+            }
+            
+            this[`states.not${s}.total`] = notTotal
+            this[`states.not${s}.last`] = notLast
+            this[`states.not${s}.since`] = moment.timestamp - notLast
+            this[`states.not${s}.potential`] = dayBalance + notTotal
+        }
+
+        this['state.assumed'] = moment.assumedState
+        this['state.raw'] = moment.rawState
+        this['state.active'] = moment.active
+        this['state.duration'] = this[`states.not${moment.assumedState}.since`]
+
+        for (const p in parameters) {
+            const param = parameters[p]
+            const intValue = parseInt(param.Value)
+            this[`parameters.${p}.value`] = intValue
+            this[`parameters.${p}.unit`] = param.Interval // TODO: Rename.
+            switch (param.Interval.toLowerCase()) {
+                case 'hour':
+                    this[`parameters.${p}.timespan`] = intValue * 60 * 60 * 1000
+                default:
+                    this[`parameters.${p}.timespan`] = intValue * 60 * 1000
+            }
+        }
+    }
+
+    seek(key) {
+        return key in this ? this[key] : key
+    }
 }
