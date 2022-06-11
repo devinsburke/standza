@@ -5,7 +5,7 @@
         "frame": true,
         "fullScreen": false,
         "developerTools": true,
-        "externalDisplay": true,
+        "externalDisplay": false,
         "height": 480,
         "width": 800,
         "x": null,

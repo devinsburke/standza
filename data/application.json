@@ -1,31 +1,31 @@
 {
   "Parameters": {
-    "work_day_minimum": {
+    "workDayMinimum": {
       "Label": "Required work time per day",
       "DefaultValue": "8",
       "DefaultInterval": "Hour"
     },
-    "away_frequency": {
+    "awayFrequency": {
       "Label": "Desired break frequency",
       "DefaultValue": "2",
       "DefaultInterval": "Hour"
     },
-    "away_now_maximum": {
+    "awayNowMaximum": {
       "Label": "Desired break length",
       "DefaultValue": "15",
       "DefaultInterval": "Minute"
     },
-    "stand_day_minimum": {
+    "standDayMinimum": {
       "Label": "Desired time standing per day",
       "DefaultValue": "8",
       "DefaultInterval": "Hour"
     },
-    "stand_frequency": {
+    "standFrequency": {
       "Label": "Desired standing frequency",
       "DefaultValue": "2",
       "DefaultInterval": "Hour"
     },
-    "stand_now_maximum": {
+    "standNowMaximum": {
       "Label": "Desired standing duration",
       "DefaultValue": "2",
       "DefaultInterval": "Hour"
@@ -35,16 +35,14 @@
     "worked-day-minimum": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing", "Sitting"],
-          "Operator": "equal",
-          "Comparison": true
+          "Arguments": "state.assumed",
+          "Operator": "notEqual",
+          "Comparison": "Absent"
         },
         {
-          "Function": "daily_time",
-          "Arguments": ["Standing", "Sitting"],
+          "Arguments": "states.notAbsent.total",
           "Operator": "greaterThanOrEqual",
-          "Comparison": "work_day_minimum"
+          "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
       "Alert": "Congratulations! You have finished your work day.",
@@ -54,16 +52,14 @@
     "stood-day-minimum": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing"],
+          "Arguments": "state.assumed",
           "Operator": "equal",
-          "Comparison": true
+          "Comparison": "Standing"
         },
         {
-          "Function": "daily_time",
-          "Arguments": ["Standing", "Sitting"],
+          "Arguments": "states.standing.total",
           "Operator": "greaterThanOrEqual",
-          "Comparison": "stand_day_minimum"
+          "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
       "Alert": "Congratulations! You have stood for at least {stand_day_minimum}. You may now sit down.",
@@ -73,10 +69,9 @@
     "cannot-work-day-minimum": {
       "Conditions": [
         {
-          "Function": "maximum_daily_time",
-          "Arguments": ["Standing", "Sitting"],
+          "Arguments": "states.notAbsent.potential",
           "Operator": "lessThanOrEqual",
-          "Comparison": "work_day_minimum"
+          "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
       "Alert": "Attention. You will not finish working by the end of the day unless you stay at your desk for the rest of the day.",
@@ -86,16 +81,14 @@
     "failed-work-day-minimum": {
       "Conditions": [
         {
-          "Function": "daily_time",
-          "Arguments": ["Standing", "Sitting"],
+          "Arguments": "states.notAbsent.total",
           "Operator": "lessThanOrEqual",
-          "Comparison": "work_day_minimum"
+          "Comparison": "parameters.workDayMinimum.timespan"
         },
         {
-          "Function": "from_schedule",
-          "Arguments": ["day_end_time"],
+          "Arguments": "schedule.day.balance",
           "Operator": "lessThanOrEqual",
-          "Comparison": "now"
+          "Comparison": 0
         }
       ],
       "Alert": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when they are met.",
@@ -105,22 +98,19 @@
     "failed-stand-day-minimum": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing", "Sitting"],
-          "Operator": "equal",
-          "Comparison": true
+          "Arguments": "state.assumed",
+          "Operator": "notEqual",
+          "Comparison": "Absent"
         },
         {
-          "Function": "daily_time",
-          "Arguments": ["Standing"],
+          "Arguments": "states.standing.total",
           "Operator": "lessThanOrEqual",
-          "Comparison": "stand_day_minimum"
+          "Comparison": "parameters.standDayMinimum.timespan"
         },
         {
-          "Function": "from_schedule",
-          "Arguments": ["day_end_time"],
+          "Arguments": "schedule.day.balance",
           "Operator": "lessThanOrEqual",
-          "Comparison": "now"
+          "Comparison": 0
         }
       ],
       "Alert": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration.",
@@ -130,16 +120,14 @@
     "end-day-clock": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing", "Sitting"],
-          "Operator": "equal",
-          "Comparison": true
+          "Arguments": "state.assumed",
+          "Operator": "notEqual",
+          "Comparison": "Absent"
         },
         {
-          "Function": "from_schedule",
-          "Arguments": ["day_end_time"],
+          "Arguments": "schedule.day.balance",
           "Operator": "lessThanOrEqual",
-          "Comparison": "now"
+          "Comparison": 0
         }
       ],
       "Alert": "Congratulations, it is now after hours. That means your work day is over.",
@@ -149,16 +137,19 @@
     "stand-now-timer": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Sitting"],
+          "Arguments": "state.assumed",
           "Operator": "equal",
-          "Comparison": true
+          "Comparison": "Sitting"
         },
         {
-          "Function": "time_since",
-          "Arguments": ["Standing"],
+          "Arguments": "states.notStanding.total",
           "Operator": "greaterThanOrEqual",
-          "Comparison": "stand_frequency"
+          "Comparison": "parameters.standFrequency.timespan"
+        },
+        {
+          "Arguments": "states.standing.since",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": "parameters.standFrequency.timespan"
         }
       ],
       "Alert": "It's time to stand!",
@@ -168,16 +159,19 @@
     "stand-now-maximum": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing"],
+          "Arguments": "state.assumed",
           "Operator": "equal",
-          "Comparison": true
+          "Comparison": "Standing"
         },
         {
-          "Function": "time_since",
-          "Arguments": ["Sitting"],
+          "Arguments": "states.standing.total",
           "Operator": "greaterThanOrEqual",
-          "Comparison": "stand_maximum"
+          "Comparison": "parameters.standNowDuration.timespan"
+        },
+        {
+          "Arguments": "states.sitting.since",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": "parameters.standNowDuration.timespan"
         }
       ],
       "Alert": "You may now sit down.",
@@ -187,16 +181,14 @@
     "cannot-stand-day-minimum": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing", "Sitting"],
-          "Operator": "equal",
-          "Comparison": true
+          "Arguments": "state.assumed",
+          "Operator": "notEqual",
+          "Comparison": "Absent"
         },
         {
-          "Function": "maximum_daily_time",
-          "Arguments": ["Standing"],
+          "Arguments": "states.standing.potential",
           "Operator": "lessThanOrEqual",
-          "Comparison": "stand_day_minimum"
+          "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
       "Alert": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day.",
@@ -206,16 +198,19 @@
     "away-now-timer": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing", "Sitting"],
-          "Operator": "equal",
-          "Comparison": true
+          "Arguments": "state.assumed",
+          "Operator": "notEqual",
+          "Comparison": "Absent"
         },
         {
-          "Function": "time_since",
-          "Arguments": ["Absent"],
+          "Arguments": "states.notAbsent.total",
           "Operator": "greaterThanOrEqual",
-          "Comparison": "away_frequency"
+          "Comparison": "parameters.awayFrequency.timespan"
+        },
+        {
+          "Arguments": "states.absent.since",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": "parameters.awayFrequency.timespan"
         }
       ],
       "Alert": "It's time to take a break!",
@@ -225,16 +220,14 @@
     "away-now-maximum": {
       "Conditions": [
         {
-          "Function": "is_state",
-          "Arguments": ["Standing", "Sitting"],
+          "Arguments": "state.assumed",
           "Operator": "equal",
-          "Comparison": false
+          "Comparison": "Absent"
         },
         {
-          "Function": "time_since",
-          "Arguments": ["Standing", "Sitting"],
+          "Arguments": "states.notAbsent.since",
           "Operator": "greaterThanOrEqual",
-          "Comparison": "away_now_maximum"
+          "Comparison": "parameters.absentNowDuration.timespan"
         }
       ],
       "Alert": "Attention. You should now return to your desk.",
@@ -284,37 +277,54 @@
 		{
 			"Type": "BAN",
 			"ContainerId": "hoursStanding",
-			"Params": ["Hour(s) Standing", "Hours Standing"]
+			"Params": {
+        "name": "Standing",
+        "valueKey": "states.standing.total",
+        "formatter": "toHM"
+      }
 		},
 		{
 			"Type": "BAN",
 			"ContainerId": "hoursWorked",
-			"Params": ["Hour(s) Worked", "Hours Working"]
+			"Params": {
+        "name": "Working",
+        "valueKey": "states.notAbsent.total",
+        "formatter": "toHM"
+      }
 		},
 		{
 			"Type": "BAN",
 			"ContainerId": "hoursLeftToEOD",
-			"Params": ["Hour(s) Left to End of Day", "Day Hours Remaining"]
+      "Params": {
+        "name": "Until End of Day",
+        "valueKey": "schedule.day.balance",
+        "formatter": "toHM"
+      }
 		},
 		{
 			"Type": "Donut",
 			"ContainerId": "workProgress",
-			"Params": ["Work Day Progress", "Hours", ["Hours Working", "Work Hours Remaining"]]
+			"Params": ["Work Day Progress", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
 		},
 		{
 			"Type": "Donut",
 			"ContainerId": "standProgress",
-			"Params": ["Stand Progress", "Hours", ["Hours Standing", "Stand Hours Remaining"]]
+			"Params": ["Stand Progress", "Hours", ["states.standing.total", "parameters.standDayMinimum.timespan"]]
 		},
 		{
 			"Type": "Bar",
 			"ContainerId": "breaksTaken",
-			"Params": ["Breaks Taken", "Breaks Taken", "Maximum Break Time"]
+			"Params": ["Breaks Taken", "activity", "parameters.absentNowDuration"]
 		},
 		{
 			"Type": "State",
 			"ContainerId": "stateTimer",
-			"Params": ["Current State", "Raw State"]
+			"Params": {
+        "valueKey": "state.assumed",
+        "compareToKey": "state.raw",
+        "subtitleKey": "state.duration",
+        "formatter": "toHMS"
+      }
 		},
 		{
 			"Type": "Clock",
