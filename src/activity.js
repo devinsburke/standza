@@ -13,6 +13,7 @@ class ActivityLog {
         this.log = []
         this.schedule = schedule
         this.significanceThreshold = significanceThreshold
+        this.addMoment(getNow(), 'startup', 'startup')
     }
 
     addMoment(datetime, rawState, assumedState) {
@@ -21,6 +22,7 @@ class ActivityLog {
         const moment = new Moment(day, datetime, rawState, assumedState, isActive)
         console.log(moment)
         this.log.push(moment)
+        return moment
     }
 
     isMeetSignificance(idx) {
@@ -44,69 +46,28 @@ class ActivityLog {
         return 0
     }
 
-    getMinutesInState(stateList) {
-        const startIdx = this.log.findIndex(m => m.active)
-        if (startIdx == -1)
-            return null
-
-        let minutes = 0
-        let last = this.log[startIdx].timestamp
-        for (let i = startIdx; i < this.log.length; i++) {
-            const item = this.log[i]
-            if (stateList.includes(item.assumedState)) {
-                minutes += (item.timestamp - last) / 60000
-                last = item.timestamp
-            }
-        }
-        return minutes
-    }
-
-    getMinutesSinceState(stateList) {
-        for (let i = this.log.length-1; i >= 0; i--) {
-            const item = this.log[i]
-            if (stateList.includes(item.assumedState))
-                return (getNow() - item.timestamp) / 60000
-        }
-        return null
-    }
-
-    getMinutesRemainingInDay() {
-        const now = getNow()
-        const [_, end] = this.schedule.toDatetimeRange(now)
-        return (end - now.getTime()) / 60000
-    }
-
-    getMaximumPossibleMinutesInState(stateList) {
-        return this.getMinutesInState(stateList) + this.getMinutesRemainingInDay()
-    }
-
-    #getStateChanges() {
+    getActivitySummary() {
+        const activity = []
+        const states = {}
         let f = this.log[0]
-        const list = []
+
+        const submitChange = (timestamp) => {
+            const duration = timestamp - f.timestamp
+            if (!(f.assumedState in states))
+                states[f.assumedState] = {total: 0}
+
+            const state = states[f.assumedState]
+            state.total += duration
+            state.last = timestamp
+            activity.push({ state: f.assumedState, start: f.timestamp, end: timestamp, duration: duration })
+        }
+
         for (const m of this.log)
             if (f.assumedState != m.assumedState) {
-                list.push({ 'state': f.assumedState, 'start': f.timestamp, 'duration': m.timestamp - f.timestamp })
+                submitChange(m.timestamp)
                 f = m
             }
-        list.push({ 'state': f.assumedState, 'start': f.timestamp, 'duration': m.timestamp - f.timestamp })
-        return list
-    }
-
-    getActivitySummary() {
-        if (!this.log)
-            return {}
-        const latest = this.log[this.log.length-1]
-        const [dayStart, dayEnd] = latest.day.toDatetimeRange(latest.timestamp)
-
-        const summary = {
-            'timestamp': latest.timestamp,
-            'rawState': latest.rawState,
-            'assumedState': latest.assumedState,
-            'scheduleStart': dayStart,
-            'scheduleEnd': dayEnd,
-            'scheduleBalance': dayEnd - latest.timestamp,
-            'stateChanges': this.#getStateChanges(),
-            'parameters': {}
-        }
+        submitChange(getNow())
+        return {states, activity}
     }
 }
