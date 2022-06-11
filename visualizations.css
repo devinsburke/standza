@@ -111,21 +111,29 @@ viz {
 		fill: white;
 	}
 	
-	viz.state.state-changed {
+	viz.state, viz.clock {
+		align-items: center;
+		flex-flow: row;
+	}
+	viz.state.mismatch {
 		color: yellow;
 	}
 	viz.state::before {
-		content: attr(data-assumed-state);
+		content: attr(data-value);
+		flex-grow: 1;
 		font-size: 2em;
 		text-align: center;
 	}
 	viz.state::after {
-		content: attr(data-time);
+		content: attr(data-subtitle);
+		flex-grow: 1;
+		font-size: 1em;
 		text-align: center;
 	}
 	viz.clock::before {
 		content: attr(data-time);
-	    font-size: 3em;
 		display: flex;
+		flex-grow: 1;
+	    font-size: 2em;
 		justify-content: space-around;
 	}
