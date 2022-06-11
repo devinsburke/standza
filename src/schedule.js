@@ -82,11 +82,11 @@ async function keyPadControl(direction) {
 		document.getElementById(time_settings.current_time).innerText = newTime;
 		var modal = document.getElementsByTagName('modal')[0];
 		
-		var dayIndex = UserConfig.Schedule.Days.findIndex(d => d.Name.toLowerCase() == time_settings.current_time.split('-')[0]);
+		var dayIndex = UserConfig.schedule.Days.findIndex(d => d.Name.toLowerCase() == time_settings.current_time.split('-')[0]);
 		if (time_settings.current_time.split('-')[1] == 'start')
-			UserConfig.Schedule.Days[dayIndex].StartTime = newTime;
+			UserConfig.schedule.Days[dayIndex].StartTime = newTime;
 		else 
-			UserConfig.Schedule.Days[dayIndex].EndTime = newTime;
+			UserConfig.schedule.Days[dayIndex].EndTime = newTime;
 		await UserConfig.save();
 		modal.remove();
 	}
@@ -132,7 +132,7 @@ function createKeyPad() {
 }
 
 function changeTime(id, value) {
-	var enabled = UserConfig.Schedule.Days.find(s => s.Name.toLowerCase() == id.split('-')[0]).Enabled;
+	var enabled = UserConfig.schedule.Days.find(s => s.Name.toLowerCase() == id.split('-')[0]).Enabled;
 	if (!enabled)
 		return;
 		
@@ -190,12 +190,12 @@ function createTimeElement(id, value) {
 }
 
 async function toggleScheduleDay(day) {
-	var index = UserConfig.Schedule.Days.findIndex(s => s.Name == day);
+	var index = UserConfig.schedule.Days.findIndex(s => s.Name == day);
 	if (index < 0)
 		return;
-		UserConfig.Schedule.Days[index].Enabled = !UserConfig.Schedule.Days[index].Enabled;
+		UserConfig.schedule.Days[index].Enabled = !UserConfig.schedule.Days[index].Enabled;
 	var element = document.getElementById('schedule-' + day.toLowerCase());
-	if (UserConfig.Schedule.Days[index].Enabled)
+	if (UserConfig.schedule.Days[index].Enabled)
 		element.classList.add('selected');
 	else 
 		element.classList.remove('selected');
@@ -204,7 +204,7 @@ async function toggleScheduleDay(day) {
 
 function setupSchedule() {
 	var scheduleContainer = document.getElementById('schedule-list');
-	UserConfig.Schedule.Days.forEach(s => {
+	UserConfig.schedule.Days.forEach(s => {
 		var li = document.createElement('li');
 		var span = document.createElement('span');
 		span.textContent = s.Name;

@@ -8,18 +8,24 @@ const vizPalette = [
 	'hsl(216deg 7% 46%)'
 ]
 
-class BAN 
+const formatters = {
+	toHM: (ms) => new Date(ms).toISOString().substring(11, 16),
+	toHMS: (ms) => new Date(ms).toISOString().substring(11, 19),
+}
+
+class BAN
 {
-	constructor(domContainer, [name, valueKey]) 
+	constructor(domContainer, {name, valueKey, formatter}) 
 	{
 		this.Name = name
 		this.ValueKey = valueKey
 		this.Element = domContainer
+		this.formatFn = formatters[formatter]
 	}
 	
 	redraw(data) {
 		this.Element.setAttribute('data-name', this.Name)
-		this.Element.setAttribute('data-value', data[this.ValueKey].toFixed(2))
+		this.Element.setAttribute('data-value', this.formatFn(data[this.ValueKey]))
 	}
 }
 
@@ -35,7 +41,7 @@ class Donut
 		this.LabelElement = document.createElement('span')
 		this.DonutElement = document.createElement('donut')
 		this.DonutElement.appendChild(this.LabelElement)
-		domContainer.appendChild(this.DonutElement)
+		this.Element.appendChild(this.DonutElement)
 		d3.select(this.DonutElement).append('svg').append('g')
 	}
 	
@@ -84,9 +90,9 @@ class Bar
 	}
 	
 	redraw(visualizationData) {
+		return // TODO: Fix.
 		this.Values = visualizationData[this.ValueKey];
-		if (this.ErrorKey != null)
-			this.ErrorValue = visualizationData[this.ErrorKey];
+		this.ErrorValue = visualizationData[this.ErrorKey];
 	
 		var bar = this.Element.querySelectorAll('bar')[0];
 		var svg = bar.querySelectorAll('svg')[0];
@@ -94,11 +100,12 @@ class Bar
 		this.#createBar();
 
 		var s = this.Element.querySelectorAll('svg')[0];
-		if (Object.entries(this.Values).length != 0)
+		if (this.Values)
 			s.classList.remove('hidden');
 	}
 	
 	#createBar() {
+		return // TODO: Fix.
 		var bar = this.Element.querySelectorAll('bar')[0];
 		var height = bar.offsetHeight - 50;
 		var width = bar.offsetWidth;
@@ -134,7 +141,6 @@ class Bar
 			.call(d3.axisLeft(y));
 					
 		var parsedValues = [];
-		window.Values = this.Values;
 		for (var v in this.Values) {
 			var output = {};
 			output['time'] = Object.keys(this.Values[v])[0];
@@ -165,27 +171,19 @@ class Bar
 
 class State 
 {
-	constructor(domContainer, [assumedStateKey, rawStateKey])
+	constructor(domContainer, {valueKey, compareToKey, subtitleKey, formatter})
 	{
 		this.Element = domContainer
-		this.AssumedStateKey = assumedStateKey
-		this.RawStateKey = rawStateKey
-		this.Seconds = 0
-		setInterval(() => this.redraw(), 1000)
+		this.valueKey = valueKey
+		this.compareToKey = compareToKey
+		this.subtitleKey = subtitleKey
+		this.formatFn = formatters[formatter]
 	}
 	
 	redraw(data) {
-		if (data) {
-			this.RawState = data[this.RawStateKey]
-			if (this.AssumedState != data[this.AssumedStateKey]) {
-				this.AssumedState = data[this.AssumedStateKey]
-				this.Seconds = 0
-			}
-		}
-		this.Element.classList.toggle('state-changed', this.AssumedState != this.RawState)
-		this.Element.setAttribute('data-assumed-state', this.AssumedState)
-		this.Element.setAttribute('data-raw-state', this.RawState)
-		this.Element.setAttribute('data-time', dateutil.toHMS(++this.Seconds * 1000))
+		this.Element.classList.toggle('mismatch', data[this.valueKey] != data[this.compareToKey])
+		this.Element.setAttribute('data-value', data[this.valueKey])
+		this.Element.setAttribute('data-subtitle', this.formatFn(data[this.subtitleKey]))
 	}
 }
 
@@ -214,6 +212,6 @@ class VisualizationManager
 	}
 
 	setData(data) {
-		this.visualizations.forEach(v => v.redraw(data['Data Points']))
+		this.visualizations.forEach(v => v.redraw(data))
 	}
 }

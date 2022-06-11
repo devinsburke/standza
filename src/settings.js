@@ -252,7 +252,7 @@ class SettingGroup
 setupSettings = function() {
 	goalGroup = new SettingGroup('Goals');
 	goalGroup.Settings = Object.entries(AppConfig.Goals).sort(g => g.Sort).map(g => {
-		return new Setting(g[0], g[1].Label, g[1].Description, UserConfig.Goals.find(u => u == g[0]) != null, GoalCategory, ToggleType);
+		return new Setting(g[0], g[1].Label, g[1].Description, UserConfig.goals.find(u => u == g[0]) != null, GoalCategory, ToggleType);
 	});
 	goalGroup.generate();
 	
@@ -263,8 +263,8 @@ setupSettings = function() {
 			p[1].Label, 
 			p[1].Description, 
 			{
-				Value: UserConfig.Parameters[p[0]] != null ? UserConfig.Parameters[p[0]].Value : p[1].DefaultValue,
-				Interval: UserConfig.Parameters[p[0]] != null ? UserConfig.Parameters[p[0]].Interval : p[1].DefaultInterval
+				Value: UserConfig.parameters[p[0]] != null ? UserConfig.parameters[p[0]].Value : p[1].DefaultValue,
+				Interval: UserConfig.parameters[p[0]] != null ? UserConfig.parameters[p[0]].Interval : p[1].DefaultInterval
 			}, 
 			ParameterCategory, 
 			TimeSpanType

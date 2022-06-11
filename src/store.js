@@ -1,45 +1,13 @@
-class Day
-{
-	#name;
-	#startTime;
-	#endTime;
-	#enabled;
-
-	constructor(data)
-	{
-		Object.defineProperties(this, {
-			Name: {
-				get: () => this.#name,
-				set: (value) => this.#name = value
-			},
-			StartTime: {
-				get: () => this.#startTime,
-				set: (value) => this.#startTime = value
-			},
-			EndTime: {
-				get: () => this.#endTime,
-				set: (value) => this.#endTime = value
-			},
-			Enabled: {
-				get: () => this.#enabled ?? false,
-				set: (value) => this.#enabled = value ?? false
-			}
-		});
-
-		Object.assign(this, data);
-	}
-
-	toStorageJson() {
-		return {
-			Name: this.Name,
-			StartTime: this.StartTime,
-			EndTime: this.EndTime,
-			Enabled: this.Enabled
-		};
+class Day {
+	constructor({Name, StartTime, EndTime, Enabled}) {
+		this.Name = Name
+		this.StartTime = StartTime
+		this.EndTime = EndTime
+		this.Enabled = Enabled || false
 	}
 
 	toDatetimeRange(datetime) {
-		const prefix = datetime.toLocaleDateString('en-CA')
+		const prefix = datetime.toLocaleDateString('en-US')
 		const start = new Date(`${prefix} ${this.StartTime}`)
 		const end = new Date(`${prefix} ${this.EndTime}`)
 		return [start, end]
@@ -53,30 +21,13 @@ class Day
 	}
 }
 
-class Schedule
-{
-	#days;
-
-	constructor(data)
-	{
-		Object.defineProperties(this, {
-			Days: {
-				get: () => this.#days,
-				set: (value) => this.#days = value ? value.map(x => Object.assign(new Day(), x)) : []
-			}
-		});
-
-		Object.assign(this, data);
-	}
-
-	toStorageJson() {
-		return {
-			Days: this.Days.map(d => d.toStorageJson())
-		};
+class Schedule {
+	constructor({Days}) {
+		this.Days = Days ? Days.map(d => new Day(d)) : []
 	}
 
 	resolveDayFromDate(datetime) {
-		const dayName = datetime.toLocaleDateString('en-CA', { weekday: 'long' })
+		const dayName = datetime.toLocaleDateString('en-US', { weekday: 'long' })
 		return this.Days.find(d => d.Name == dayName)
 	}
 
@@ -94,70 +45,61 @@ class Schedule
 		const day = this.resolveDayFromDate(datetime)
 		return day.toDatetimeRange(datetime)
 	}
+}
 
-	toMap(datetime) {
-		const [dayStart, dayEnd] = this.toDatetimeRange(datetime)
-		return {
-			"day_start_time": dayStart,
-			"day_end_time": dayEnd,
-			"week_start_time": null,
-			"week_end_time": null,
-		}
+class Condition {
+    #operators = {
+        "equal": (a, b) => a == b,
+        "notEqual": (a, b) => a != b,
+        "greaterThanOrEqual": (a, b) => a >= b,
+        "lessThanOrEqual": (a, b) => a <= b
+    }
+
+	constructor({Arguments, Operator, Comparison}) { 
+		this.Arguments = Arguments
+		this.Operator = Operator
+		this.Comparison = Comparison
+	}
+
+	evaluate(summary) {
+		const op = this.#operators[this.Operator]
+		return op(summary.seek(this.Arguments), summary.seek(this.Comparison))
 	}
 }
 
-class Condition
-{
-	Function
-	Arguments
-	Operator
-	Comparison
-
-	constructor(data) { Object.assign(this, data) }
-}
-
-class Trigger
-{
-	Alert
-	Targets
-	Achieves
-	Conditions
-
-	constructor(data)
-	{
-		Object.assign(this, data)
-		this.Conditions = this.Conditions.map(c => new Condition(c))
+class Trigger {
+	constructor({Alert, Targets, Achieves, Conditions}) {
+		this.Alert = Alert
+		this.Targets = Targets || []
+		this.Achieves = Achieves || []
+		this.Conditions = Conditions ? Conditions.map(c => new Condition(c)) : []
 	}
 }
 
-class Goal
-{
-	Label
-	Description
-	Sort
-	Triggers
-
-	constructor(data) { Object.assign(this, data) }
+class Goal {
+	constructor({Label, Description, Sort, Triggers}) { 
+		this.Label = Label
+		this.Description = Description
+		this.Sort = Sort
+		this.Triggers = Triggers || []
+	}
 }
 
-class Parameter
-{
-	Label
-	DefaultValue
-	DefaultInterval
-
-	constructor(data) { Object.assign(this, data) }
+class Parameter {
+	constructor({Label, DefaultValue, DefaultInterval}) { 
+		this.Label = Label
+		this.DefaultValue = DefaultValue
+		this.DefaultInterval = DefaultInterval
+	}
 }
 
-class AppConfiguration
-{
+class AppConfiguration {
 	Visualizations = []
 	Parameters = {}
 	Triggers = {}
 	Goals = {}
 
-	constructor(data)
-	{
+	constructor(data) {
 		Object.assign(this, data)
 		Object.entries(this.Parameters).forEach(([k, v]) => this.Parameters[k] = new Parameter(v))
 		Object.entries(this.Triggers).forEach(([k, v]) => this.Triggers[k] = new Trigger(v))
@@ -171,44 +113,15 @@ class AppConfiguration
 	}
 }
 
-class UserConfiguration
-{
-	#refreshInterval;
-	#stateChangeTolerance;
-	#schedule;
-	#goals;
-	#parameters;
-	#path;
+class UserConfiguration {
+	#path
 
-	constructor(data)
-	{
-		Object.defineProperties(this, {
-			RefreshInterval: {
-				get: () => this.#refreshInterval,
-				set: (value) => this.#refreshInterval = value
-			},
-			StateChangeTolerance: {
-				get: () => this.#stateChangeTolerance,
-				set: (value) => this.#stateChangeTolerance = value
-			},
-			Schedule: {
-				get: () => this.#schedule,
-				set: (value) => this.#schedule = new Schedule(value)
-			},
-			Goals: {
-				get: () => this.#goals,
-				set: (value) => this.#goals = value
-			},
-			Parameters: {
-				get: () => this.#parameters,
-				set: (value) => this.#parameters = value
-			},
-			Path: {
-				get: () => this.#path
-			}
-		});
-
-		Object.assign(this, data);
+	constructor({refreshInterval, stateChangeTolerance, schedule, goals, parameters}) {
+		this.refreshInterval = refreshInterval || 0
+		this.stateChangeTolerance = stateChangeTolerance || 0
+		this.schedule = new Schedule(schedule)
+		this.goals = goals || []
+		this.parameters = parameters || []
 	}
 
 	static async fromJson(jsonPath) {
@@ -218,38 +131,28 @@ class UserConfiguration
 		output.#path = jsonPath
 		return output
 	}
-	
-	#toStorageJson() {
-		return JSON.stringify({
-			RefreshInterval: this.RefreshInterval,
-			StateChangeTolerance: this.StateChangeTolerance,
-			Schedule: this.Schedule.toStorageJson(),
-			Goals: this.Goals,
-			Parameters: this.Parameters
-		});
-	}
 
 	async save() {
 		var event = new CustomEvent('PutFile',
 		{
 			detail: {
-				path: this.Path,
-				content: this.#toStorageJson()
+				path: this.#path,
+				content: JSON.stringify(this)
 			}
-		});
-		document.dispatchEvent(event);
+		})
+		document.dispatchEvent(event)
 	}
 	
 	async changeGoal(goalId, value) {
 		if (value)
-			this.Goals.push(goalId);
+			this.goals.push(goalId)
 		else
-			this.Goals.splice(this.Goals.indexOf(goalId), 1)
-		await this.save();
+			this.goals.splice(this.goals.indexOf(goalId), 1)
+		await this.save()
 	}
 	
 	async changeParameter(parameterId, value) {
-		this.Parameters[parameterId] = value;
-		await this.save();
+		this.parameters[parameterId] = value
+		await this.save()
 	}
 }
