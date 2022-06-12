@@ -1,13 +1,8 @@
 var tabs = ['home','progress','calendar','settings','preview']
 var AppConfig = null
 var UserConfig = null
-var stateManager = null
-var visualizationManager = null
 
 const getNow = () => new Date(Date.now())
-const dateutil = {
-	toHMS: (ms) => new Date(ms).toISOString().substring(11, 19)
-}
 
 function changeTab(tabName) {
 	document.querySelectorAll('.selected-tab').forEach(b => b.classList.remove('selected-tab'))
@@ -17,15 +12,13 @@ function changeTab(tabName) {
 	container.classList.add(tabName)
 }
 
-(async () => {
+window.addEventListener('DOMContentLoaded', async () => {
 	AppConfig = await AppConfiguration.fromJson("./data/application.json")
 	UserConfig = await UserConfiguration.fromJson("./data/user.json")
 	setupSchedule(UserConfig.schedule)
 	setupSettings()
 
-	// TODO: Remove window.visualizationManager references in favor of dependency injection.
-	visualizationManager = new VisualizationManager(AppConfig.Visualizations)
-	stateManager = new StateManager(
+	const stateManager = new StateManager(
 		new ActivityLog(
 			UserConfig.schedule,
 			UserConfig.stateChangeTolerance
@@ -33,8 +26,8 @@ function changeTab(tabName) {
 		new CameraProcessor(
 			'video',
 			document.getElementById('capture-wrapper'),
-			window.picamera,
-			window.tensorflow
+			standzaAPI.estimatePose,
+			standzaAPI.snapCameraImage
 		),
 		new RuleEngine(
 			UserConfig.goals,
@@ -45,11 +38,13 @@ function changeTab(tabName) {
 				'./audio/${soundId}.mp3'
 			)
 		),
-		visualizationManager,
+		new VisualizationManager(
+			AppConfig.Visualizations
+		),
 		UserConfig.parameters,
-		UserConfig.refreshInterval
+		() => UserConfig.refreshRate
 	)
 	stateManager.ruleEngine.audioPlayer.buildChime('.chime')
 	await stateManager.camera.setupCamera()
-	await stateManager.start()
-})();
+	await stateManager.run()
+})

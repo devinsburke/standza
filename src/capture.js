@@ -1,8 +1,8 @@
 class CameraProcessor {
-    constructor(cameraMode, elementContainer, picamera, tensorflow) {
-		this.picamera = picamera
-		this.tensorflow = tensorflow
-		this.cameraMode = cameraMode ?? 'video'
+    constructor(cameraMode, elementContainer, estimatePoseFn, snapCameraImageFn) {
+		this.snapCameraImage = snapCameraImageFn
+		this.estimatePose = estimatePoseFn
+		this.cameraMode = cameraMode || 'video'
 		this.elements = {
 			container: elementContainer,
 			image: elementContainer.getElementsByTagName('img')[0],
@@ -33,13 +33,13 @@ class CameraProcessor {
 			await context.drawImage(this.elements.video, 0, 0, this.elements.canvas.width, this.elements.canvas.height)
 			this.elements.image.src = this.elements.canvas.toDataURL()
 		} else if (this.cameraMode == 'img') {
-			this.elements.image.src = await window.picamera.snapDataUrl()
+			this.elements.image.src = await this.snapCameraImage()
 		}
 		return await Promise.race([loaded, timedOut]) != Error
 	}
 
 	async getBodyPartsFromImage() {
-		const poses = await this.tensorflow.estimatePose(this.elements.image)
+		const poses = await this.estimatePose(this.elements.image)
 		return poses.keypoints.filter(p => p.score > 0.5).map(p => p.part)
 	}
 
@@ -59,4 +59,4 @@ const PersonState = Object.freeze({
 	Absent: 'Absent',
 	Sitting: 'Sitting',
 	Standing: 'Standing'
-});
+})
