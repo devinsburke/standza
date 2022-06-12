@@ -19,10 +19,7 @@ class ActivityLog {
     addMoment(datetime, rawState, assumedState) {
         const day = this.schedule.resolveDayFromDate(datetime)
         const isActive = day.isScheduledAt(datetime)
-        const moment = new Moment(day, datetime, rawState, assumedState, isActive)
-        console.log(moment)
-        this.log.push(moment)
-        return moment
+        this.log.push(new Moment(day, datetime, rawState, assumedState, isActive))
     }
 
     isMeetSignificance(idx) {
@@ -44,30 +41,5 @@ class ActivityLog {
             if (this.log[i].rawState != from.rawState)
                 return i + 1
         return 0
-    }
-
-    getActivitySummary() {
-        const activity = []
-        const states = {}
-        let f = this.log[0]
-
-        const submitChange = (timestamp) => {
-            const duration = timestamp - f.timestamp
-            if (!(f.assumedState in states))
-                states[f.assumedState] = {total: 0}
-
-            const state = states[f.assumedState]
-            state.total += duration
-            state.last = timestamp
-            activity.push({ state: f.assumedState, start: f.timestamp, end: timestamp, duration: duration })
-        }
-
-        for (const m of this.log)
-            if (f.assumedState != m.assumedState) {
-                submitChange(m.timestamp)
-                f = m
-            }
-        submitChange(getNow())
-        return {states, activity}
     }
 }
