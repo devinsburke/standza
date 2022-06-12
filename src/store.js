@@ -94,55 +94,38 @@ class Parameter {
 }
 
 class AppConfiguration {
-	Visualizations = []
-	Parameters = {}
-	Triggers = {}
-	Goals = {}
-
-	constructor(data) {
-		Object.assign(this, data)
-		Object.entries(this.Parameters).forEach(([k, v]) => this.Parameters[k] = new Parameter(v))
-		Object.entries(this.Triggers).forEach(([k, v]) => this.Triggers[k] = new Trigger(v))
-		Object.entries(this.Goals).forEach(([k, v]) => this.Goals[k] = new Goal(v))
+	constructor({Visualizations, Parameters, Triggers, Goals}) {
+		this.Visualizations = Visualizations || []
+		this.Parameters = {}
+		this.Triggers = {}
+		this.Goals = {}
+		for (const k in Parameters) this.Parameters[k] = new Parameter(Parameters[k])
+		for (const k in Triggers) this.Triggers[k] = new Trigger(Triggers[k])
+		for (const k in Goals) this.Goals[k] = new Goal(Goals[k])
 	}
 
 	static async fromJson(jsonPath) {
 		const response = await fetch(jsonPath)
-		const jsn = await response.json()
-		return new AppConfiguration(jsn)
+		return new AppConfiguration(await response.json())
 	}
 }
 
 class UserConfiguration {
-	#path
-
-	constructor({refreshInterval, stateChangeTolerance, schedule, goals, parameters}) {
-		this.refreshInterval = refreshInterval || 0
-		this.stateChangeTolerance = stateChangeTolerance || 0
+	constructor(saveCallback, {refreshRate, stateChangeTolerance, schedule, goals, parameters}) {
+		this.refreshRate = refreshRate || 1000
+		this.stateChangeTolerance = stateChangeTolerance || 10000
 		this.schedule = new Schedule(schedule)
 		this.goals = goals || []
-		this.parameters = parameters || []
+		this.parameters = parameters || {}
+		this.save = () => saveCallback(this)
 	}
 
-	static async fromJson(jsonPath) {
-		const response = await fetch(jsonPath)
-		const jsn = await response.json()
-		const output = new UserConfiguration(jsn)
-		output.#path = jsonPath
-		return output
+	static async fromJson(path, writeFileFn) {
+		const response = await fetch(path)
+		const saveCallback = (c) => writeFileFn(path, JSON.stringify(c))
+		return new UserConfiguration(saveCallback, await response.json())
 	}
 
-	async save() {
-		var event = new CustomEvent('PutFile',
-		{
-			detail: {
-				path: this.#path,
-				content: JSON.stringify(this)
-			}
-		})
-		document.dispatchEvent(event)
-	}
-	
 	async changeGoal(goalId, value) {
 		if (value)
 			this.goals.push(goalId)
