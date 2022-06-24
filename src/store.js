@@ -12,13 +12,6 @@ class Day {
 		const end = new Date(`${prefix} ${this.EndTime}`)
 		return [start, end]
 	}
-
-	isScheduledAt(datetime) {
-		if (!this.Enabled || !this.StartTime || !this.EndTime)
-			return false
-		const [start, end] = this.toDatetimeRange(datetime)
-		return datetime >= start && datetime <= end
-	}
 }
 
 class Schedule {
@@ -29,21 +22,6 @@ class Schedule {
 	resolveDayFromDate(datetime) {
 		const dayName = datetime.toLocaleDateString('en-US', { weekday: 'long' })
 		return this.Days.find(d => d.Name == dayName)
-	}
-
-	isScheduledAt(datetime) {
-		const day = this.resolveDayFromDate(datetime)
-		return day && day.isScheduledAt(date)
-	}
-
-	isScheduledOn(date) {
-		const day = this.resolveDayFromDate(date)
-		return day && day.Enabled
-	}
-
-	toDatetimeRange(datetime) {
-		const day = this.resolveDayFromDate(datetime)
-		return day.toDatetimeRange(datetime)
 	}
 }
 
@@ -68,10 +46,8 @@ class Condition {
 }
 
 class Trigger {
-	constructor({Alert, Targets, Achieves, Conditions}) {
+	constructor({Alert, Conditions}) {
 		this.Alert = Alert
-		this.Targets = Targets || []
-		this.Achieves = Achieves || []
 		this.Conditions = Conditions ? Conditions.map(c => new Condition(c)) : []
 	}
 }
