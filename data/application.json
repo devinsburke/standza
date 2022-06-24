@@ -35,6 +35,11 @@
     "worked-day-minimum": {
       "Conditions": [
         {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
+        {
           "Arguments": "state.assumed",
           "Operator": "notEqual",
           "Comparison": "Absent"
@@ -45,12 +50,15 @@
           "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
-      "Alert": "Congratulations! You have finished your work day.",
-      "Targets": ["Absent"],
-      "Achieves": []
+      "Alert": "Congratulations! You have finished your work day."
     },
     "stood-day-minimum": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "equal",
@@ -62,24 +70,30 @@
           "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
-      "Alert": "Congratulations! You have stood for at least {stand_day_minimum}. You may now sit down.",
-      "Targets": ["Sitting"],
-      "Achieves": []
+      "Alert": "Congratulations! You stood for {} today. You may now sit down."
     },
     "cannot-work-day-minimum": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
         {
           "Arguments": "states.notAbsent.potential",
           "Operator": "lessThanOrEqual",
           "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
-      "Alert": "Attention. You will not finish working by the end of the day unless you stay at your desk for the rest of the day.",
-      "Targets": ["Standing", "Sitting"],
-      "Achieves": []
+      "Alert": "Attention. You will not finish working on time unless you stay at your desk for the rest of the day."
     },
     "failed-work-day-minimum": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
         {
           "Arguments": "states.notAbsent.total",
           "Operator": "lessThanOrEqual",
@@ -91,12 +105,15 @@
           "Comparison": 0
         }
       ],
-      "Alert": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when they are met.",
-      "Targets": ["Standing", "Sitting"],
-      "Achieves": []
+      "Alert": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when your have met your set hours."
     },
     "failed-stand-day-minimum": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "notEqual",
@@ -113,12 +130,15 @@
           "Comparison": 0
         }
       ],
-      "Alert": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration.",
-      "Targets": ["Absent", "Standing", "Sitting"],
-      "Achieves": []
+      "Alert": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration."
     },
     "end-day-clock": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "notEqual",
@@ -130,12 +150,25 @@
           "Comparison": 0
         }
       ],
-      "Alert": "Congratulations, it is now after hours. That means your work day is over.",
-      "Targets": ["Absent"],
-      "Achieves": []
+      "Alert": "Congratulations, it is now after hours. That means your work day is over."
     },
     "stand-now-timer": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
+        {
+          "Arguments": "schedule.day.balance",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": 0
+        },
+        {
+          "Arguments": "schedule.day.elapsed",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": "parameters.standFrequency.timespan"
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "equal",
@@ -152,12 +185,25 @@
           "Comparison": "parameters.standFrequency.timespan"
         }
       ],
-      "Alert": "It's time to stand!",
-      "Targets": ["Standing"],
-      "Achieves": []
+      "Alert": "It's time to stand!"
     },
     "stand-now-maximum": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
+        {
+          "Arguments": "schedule.day.balance",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": 0
+        },
+        {
+          "Arguments": "schedule.day.elapsed",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": "parameters.standNowDuration.timespan"
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "equal",
@@ -174,12 +220,15 @@
           "Comparison": "parameters.standNowDuration.timespan"
         }
       ],
-      "Alert": "You may now sit down.",
-      "Targets": ["Standing", "Sitting"],
-      "Achieves": []
+      "Alert": "You may now sit down."
     },
     "cannot-stand-day-minimum": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "notEqual",
@@ -191,12 +240,25 @@
           "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
-      "Alert": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day.",
-      "Targets": ["Absent"],
-      "Achieves": []
+      "Alert": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day."
     },
     "away-now-timer": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
+        {
+          "Arguments": "schedule.day.balance",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": 0
+        },
+        {
+          "Arguments": "schedule.day.elapsed",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": "parameters.awayFrequency.timespan"
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "notEqual",
@@ -213,12 +275,25 @@
           "Comparison": "parameters.awayFrequency.timespan"
         }
       ],
-      "Alert": "It's time to take a break!",
-      "Targets": ["Absent"],
-      "Achieves": []
+      "Alert": "It's time to take a break!"
     },
     "away-now-maximum": {
       "Conditions": [
+        {
+          "Arguments": "schedule.day.enabled",
+          "Operator": "equal",
+          "Comparison": true
+        },
+        {
+          "Arguments": "schedule.day.balance",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": 0
+        },
+        {
+          "Arguments": "schedule.day.elapsed",
+          "Operator": "greaterThanOrEqual",
+          "Comparison": "parameters.absentNowDuration.timespan"
+        },
         {
           "Arguments": "state.assumed",
           "Operator": "equal",
@@ -230,9 +305,7 @@
           "Comparison": "parameters.absentNowDuration.timespan"
         }
       ],
-      "Alert": "Attention. You should now return to your desk.",
-      "Targets": ["Standing", "Sitting"],
-      "Achieves": []
+      "Alert": "Attention. You should now return to your desk."
     }
   },
   "Goals": {
