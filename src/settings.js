@@ -15,78 +15,14 @@ findSetting = function(id) {
 
 class Setting
 {
-	#id;
-	#name;
-	#description;
-	#value;
-	#type;
-	#category;
-	#element;
-	
 	constructor(id, name, description, value, category, type) 
 	{
-		this.#id = id;
-		this.#name = name;
-		this.#description = description;
-		this.#value = value;
-		this.#type = type;
-		this.#category = category;
-		
-		Object.defineProperties(this, {
-			Id: {
-				get: function() {
-					return this.#id;
-				},
-				set: function(value) {
-					this.#id = value;
-				}
-			},
-			Name: {
-				get: function() {
-					return this.#name;
-				},
-				set: function(value) {
-					this.#name = value;
-				}
-			},
-			Description: {
-				get: function() {
-					return this.#description;
-				},
-				set: function(value) {
-					this.#description = value;
-				}
-			},
-			Value: {
-				get: function() {
-					return this.#value;
-				},
-				set: function(value) {
-					this.#value = value;
-				}
-			},
-			Category: {
-				get: function() {
-					return this.#category;
-				},
-				set: function(value) {
-					this.#category = value;
-				}
-			},
-			Type: {
-				get: function() {
-					return this.#type;
-				},
-				set: function(value) {
-					this.#type = value;
-				}
-			},
-			Element: {
-				get: function() {
-					return this.#element;
-				}
-			}
-		});
+		this.Id = id;
+		this.Name = name;
+		this.Description = description;
+		this.Value = value;
+		this.Type = type;
+		this.Category = category;
 	}
 	
 	#generateToggle(container) {
@@ -209,32 +145,11 @@ class Setting
 
 class SettingGroup 
 {
-	#name;
-	#settings;
 	#element;
 		
 	constructor(name) 
 	{
-		this.#name = name;
-		
-		Object.defineProperties(this, {
-			Name: {
-				get: function() {
-					return this.#name;
-				},
-				set: function(value) {
-					this.#name = value;
-				}
-			},
-			Settings: {
-				get: function() {
-					return this.#settings;
-				},
-				set: function(value) {
-					this.#settings = value;
-				}
-			}
-		});
+		this.Name = name
 	}
 	
 	generate() {
