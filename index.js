@@ -18,33 +18,36 @@ window.addEventListener('DOMContentLoaded', async () => {
 	setupSchedule(UserConfig.schedule)
 	setupSettings()
 
-	const stateManager = new StateManager(
-		new ActivityLog(
-			UserConfig.schedule,
-			UserConfig.stateChangeTolerance
-		),
-		new CameraProcessor(
-			'video',
-			document.getElementById('capture-wrapper'),
-			standzaAPI.estimatePose,
-			standzaAPI.snapCameraImage
-		),
-		new RuleEngine(
-			UserConfig.goals,
-			AppConfig.Goals,
-			AppConfig.Triggers,
-			new AudioPlayer(
-				document.getElementById('audio-container'),
-				'./audio/${soundId}.mp3'
-			)
-		),
-		new VisualizationManager(
-			AppConfig.Visualizations
-		),
-		UserConfig.parameters,
-		() => UserConfig.refreshRate
+	const audioPlayer = new AudioPlayer(
+		document.getElementById('audio-container'),
+		'./audio/${soundId}.mp3'
 	)
-	stateManager.ruleEngine.audioPlayer.buildChime('.chime')
-	await stateManager.camera.setupCamera()
+	audioPlayer.buildChime('.chime')
+
+	const camera = new CameraProcessor(
+		'video',
+		document.getElementById('capture-wrapper'),
+		standzaAPI.estimatePose,
+		standzaAPI.snapCameraImage
+	)
+	await camera.setupCamera()
+
+	const vizManager = new VisualizationManager(AppConfig.Visualizations)
+	const rules = new RuleEngine(
+		UserConfig.goals,
+		AppConfig.Goals,
+		AppConfig.Triggers,
+		audioPlayer
+	)
+
+	const stateManager = new StateManager(
+		new ActivityLog(UserConfig.stateChangeTolerance),
+		camera,
+		UserConfig.schedule,
+		UserConfig.parameters,
+		() => UserConfig.refreshRate,
+	)
+	stateManager.hooks.push(s => rules.run(s))
+	stateManager.hooks.push(s => vizManager.setData(s))
 	await stateManager.run()
 })

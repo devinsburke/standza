@@ -1,19 +1,25 @@
 class StateManager {
-    constructor(activityLog, camera, ruleEngine, visualizationManager, goalParameters, refreshRateFn) {
+    constructor(activityLog, camera, schedule, goalParameters, refreshRateFn) {
         this.currentState = null
         this.activity = activityLog
         this.camera = camera
-        this.ruleEngine = ruleEngine
-        this.visualizationManager = visualizationManager
+        this.schedule = schedule
         this.goalParameters = goalParameters
         this.getRefreshRate = refreshRateFn
+        this.hooks = []
+    }
+
+    callHooks(summary) {
+        this.hooks.forEach(fn => fn(summary))
     }
 
     async run() {
         // Construct and store current moment.
+        const now = getNow()
+        const day = this.schedule.resolveDayFromDate(now)
         const rawState = await this.camera.getCurrentPersonState()
         this.currentState ??= rawState
-        this.activity.addMoment(getNow(), rawState, this.currentState)
+        this.activity.addMoment(day, now, rawState, this.currentState)
 
         if (this.currentState != rawState) {
             // Update significance of near-latest entries if appropriate.
@@ -25,13 +31,7 @@ class StateManager {
             }
         }
 
-        const summary = new Summary(this.goalParameters, this.activity.log)
-
-        // TODO: Handle how rules usually should not run past work time.
-        if (this.activity.schedule.isScheduledOn(getNow()))
-            this.ruleEngine.run(summary)
-
-        this.visualizationManager.setData(summary)
+        this.callHooks(new Summary(this.goalParameters, this.activity.log))
         setTimeout((async() => await this.run()), this.getRefreshRate())
     }
 }
