@@ -60,7 +60,6 @@ class Summary {
     #injectCurrentState(moment) {
         this['state.assumed'] = moment.assumedState
         this['state.raw'] = moment.rawState
-        this['state.active'] = moment.active
         this['state.duration'] = this[`states.not${moment.assumedState}.since`]
     }
 

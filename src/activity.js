@@ -1,25 +1,20 @@
 class Moment {
-    constructor(day, timestamp, rawState, assumedState, active) {
+    constructor(day, timestamp, rawState, assumedState) {
         this.day = day
         this.timestamp = timestamp
         this.rawState = rawState
         this.assumedState = assumedState
-        this.active = active
     }
 }
 
 class ActivityLog {
-    constructor(schedule, significanceThreshold) {
+    constructor(significanceThreshold) {
         this.log = []
-        this.schedule = schedule
         this.significanceThreshold = significanceThreshold
-        this.addMoment(getNow(), 'startup', 'startup')
     }
 
-    addMoment(datetime, rawState, assumedState) {
-        const day = this.schedule.resolveDayFromDate(datetime)
-        const isActive = day.isScheduledAt(datetime)
-        this.log.push(new Moment(day, datetime, rawState, assumedState, isActive))
+    addMoment(day, datetime, rawState, assumedState) {
+        this.log.push(new Moment(day, datetime, rawState, assumedState))
     }
 
     isMeetSignificance(idx) {
