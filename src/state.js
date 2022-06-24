@@ -1,37 +1,49 @@
+class Moment {
+    constructor(day, timestamp, rawState, assumedState) {
+        this.day = day
+        this.timestamp = timestamp
+        this.rawState = rawState
+        this.assumedState = assumedState
+    }
+}
+
 class StateManager {
-    constructor(activityLog, camera, schedule, goalParameters, refreshRateFn) {
-        this.currentState = null
-        this.activity = activityLog
+    #log = []
+    #currentState = null
+
+    constructor(camera, schedule, goalParameters, refreshRateFn, stateChangeToleranceFn) {
         this.camera = camera
         this.schedule = schedule
         this.goalParameters = goalParameters
         this.getRefreshRate = refreshRateFn
+        this.getStateChangeTolerance = stateChangeToleranceFn
         this.hooks = []
     }
 
-    callHooks(summary) {
-        this.hooks.forEach(fn => fn(summary))
+    log(timestamp, rawState) {
+        const day = this.schedule.resolveDayFromDate(timestamp)
+        this.#log.push(new Moment(day, timestamp, rawState, this.#currentState))
+
+        if (this.#currentState != rawState) {
+            const latestChange = this.#getRawStateTimestamp(rawState)
+            if (timestamp - latestChange >= this.getStateChangeTolerance())
+                this.#currentState = rawState
+        }
+    }
+
+    #getRawStateTimestamp(state) {
+        let i = this.#log.length
+        while (i-- && this.#log[i].rawState == state) { }
+        return this.#log[i+1].timestamp
     }
 
     async run() {
-        // Construct and store current moment.
-        const now = getNow()
-        const day = this.schedule.resolveDayFromDate(now)
         const rawState = await this.camera.getCurrentPersonState()
-        this.currentState ??= rawState
-        this.activity.addMoment(day, now, rawState, this.currentState)
+        this.#currentState ??= rawState
+        this.log(getNow(), rawState)
 
-        if (this.currentState != rawState) {
-            // Update significance of near-latest entries if appropriate.
-            const endIdx = this.activity.getIndexOfLatest()
-            const startIdx = this.activity.getStartIndexOf(endIdx)
-            if (this.activity.isMeetSignificance(startIdx)) {
-                this.activity.updateAssumedState(startIdx, endIdx, rawState)
-                this.currentState = rawState
-            }
-        }
-
-        this.callHooks(new Summary(this.goalParameters, this.activity.log))
+        const summary = new Summary(this.goalParameters, this.#log)
+        this.hooks.forEach(fn => fn(summary))
         setTimeout((async() => await this.run()), this.getRefreshRate())
     }
 }

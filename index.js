@@ -41,11 +41,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 	)
 
 	const stateManager = new StateManager(
-		new ActivityLog(UserConfig.stateChangeTolerance),
 		camera,
 		UserConfig.schedule,
 		UserConfig.parameters,
 		() => UserConfig.refreshRate,
+		() => UserConfig.stateChangeTolerance
 	)
 	stateManager.hooks.push(s => rules.run(s))
 	stateManager.hooks.push(s => vizManager.setData(s))
