@@ -18,11 +18,12 @@ class StateManager {
         this.getRefreshRate = refreshRateFn
         this.getStateChangeTolerance = stateChangeToleranceFn
         this.hooks = []
+        this.log(getNow(), 'Absent')
     }
 
     log(timestamp, rawState) {
         const day = this.schedule.resolveDayFromDate(timestamp)
-        this.#log.push(new Moment(day, timestamp, rawState, this.#currentState))
+        this.#log.push(new Moment(day, timestamp, rawState, this.#currentState || rawState))
 
         if (this.#currentState != rawState) {
             const latestChange = this.#getRawStateTimestamp(rawState)
