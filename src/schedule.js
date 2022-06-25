@@ -5,14 +5,14 @@ var time_settings = {
 	current_minute: '',
 	current_type: '',
 	editing: false
-};
+}
 
 var keypad_items = [
 	[7,8,9],
 	[4,5,6],
 	[1,2,3],
 	['AM',0,'PM']
-];
+]
 
 var keypad_controls = [
 	[
@@ -20,41 +20,7 @@ var keypad_controls = [
 		{tag: 'done', icon: 'done', action: 'done'},
 		{tag: 'direction', icon: 'arrow_right', action: 'right'}
 	]
-];
-
-function keyPadEmit(value) {
-	if (value == 'AM' || value == 'PM') {
-		time_settings.current_type = value;
-		document.getElementsByTagName('time-type')[0].innerText = time_settings.current_type;
-		return;
-	}
-	var currentValue = '';
-	if (time_settings.editing) {
-		if (time_settings.current_element == 'hour')
-			currentValue = time_settings.current_hour;
-		else if (time_settings.current_element == 'minute')
-			currentValue = time_settings.current_minute;
-	}
-	else 
-		time_settings.editing = true;
-	if (currentValue == '' && value == '0' && time_settings.current_element != 'minute')
-		return;
-	currentValue += value;
-	if (time_settings.current_element == 'hour') {
-		if (parseInt(currentValue) > 12)
-			currentValue = '12';
-		time_settings.current_hour = currentValue;
-		document.getElementsByTagName('hour')[0].innerText = time_settings.current_hour;
-	}
-	else if (time_settings.current_element == 'minute') {
-		if (parseInt(currentValue) > 59)
-			currentValue = '59';
-		time_settings.current_minute = parseInt(currentValue).toString().padStart(2, '0');
-		document.getElementsByTagName('minute')[0].innerText = time_settings.current_minute;
-	}
-	if (currentValue.length > 1 || time_settings.current_element == 'hour' && value != '1')
-		keyPadControl('right');
-}
+]
 
 async function keyPadControl(direction) {
 	if (direction == 'left') {
@@ -93,42 +59,71 @@ async function keyPadControl(direction) {
 }
 
 function createKeyPadButton(value) {
-	var button = document.createElement('key');
-	button.textContent = value;
-	button.onclick = function(e) {
-		keyPadEmit(e.target.textContent);
-	}; 
-	return button;
+	var button = document.createElement('key')
+	button.textContent = value
+	button.onclick = e => {
+		const value = e.target.textContent
+		if (value == 'AM' || value == 'PM') {
+			time_settings.current_type = value;
+			document.getElementsByTagName('time-type')[0].innerText = time_settings.current_type;
+			return;
+		}
+		var currentValue = '';
+		if (time_settings.editing) {
+			if (time_settings.current_element == 'hour')
+				currentValue = time_settings.current_hour;
+			else if (time_settings.current_element == 'minute')
+				currentValue = time_settings.current_minute;
+		}
+		else 
+			time_settings.editing = true;
+		if (currentValue == '' && value == '0' && time_settings.current_element != 'minute')
+			return;
+		currentValue += value;
+		if (time_settings.current_element == 'hour') {
+			if (parseInt(currentValue) > 12)
+				currentValue = '12';
+			time_settings.current_hour = currentValue;
+			document.getElementsByTagName('hour')[0].innerText = time_settings.current_hour;
+		}
+		else if (time_settings.current_element == 'minute') {
+			if (parseInt(currentValue) > 59)
+				currentValue = '59';
+			time_settings.current_minute = parseInt(currentValue).toString().padStart(2, '0');
+			document.getElementsByTagName('minute')[0].innerText = time_settings.current_minute;
+		}
+		if (currentValue.length > 1 || time_settings.current_element == 'hour' && value != '1')
+			keyPadControl('right');
+	}
+	return button
 }
 
 function createKeyPad() {
-	var keyPad = document.createElement('key-pad');
+	var keyPad = document.createElement('key-pad')
 	keypad_items.forEach(k => {
-		var row = document.createElement('row');
+		var row = document.createElement('row')
 		k.forEach(n => {
-			var btn = createKeyPadButton(n.toString());
-			if (n.toString() == 'AM' || n.toString() == 'PM')
-				btn.classList.add('time-type');
-			row.appendChild(btn);
-		});
-		keyPad.appendChild(row);
-	});
+			var btn = createKeyPadButton(n.toString())
+			if (n == 'AM' || n == 'PM')
+				btn.classList.add('time-type')
+			row.appendChild(btn)
+		})
+		keyPad.appendChild(row)
+	})
 	keypad_controls.forEach(k => {
-		var row = document.createElement('row');
+		var row = document.createElement('row')
 		k.forEach(n => {
-			var btn = document.createElement(n.tag);
-			var icon = document.createElement('i');
-			icon.classList.add('material-icons');
-			icon.textContent = n.icon;
-			btn.appendChild(icon);
-			btn.onclick = function(e) {
-				keyPadControl(n.action);
-			};
-			row.appendChild(btn);
-		});
-		keyPad.appendChild(row);
-	});
-	return keyPad;
+			var btn = document.createElement(n.tag)
+			var icon = document.createElement('i')
+			icon.classList.add('material-icons')
+			icon.textContent = n.icon
+			btn.appendChild(icon)
+			btn.onclick = _ => keyPadControl(n.action)
+			row.appendChild(btn)
+		})
+		keyPad.appendChild(row)
+	})
+	return keyPad
 }
 
 function changeTime(id, value) {
@@ -174,19 +169,15 @@ function changeTime(id, value) {
 	modal.appendChild(createKeyPad());
 	
 	body.appendChild(modal);
-	setTimeout(function(){ 
-		document.getElementsByTagName('modal')[0].classList.remove('hidden');
-	}, 200);
+	setTimeout(() => document.getElementsByTagName('modal')[0].classList.remove('hidden'), 200)
 }
 
 function createTimeElement(id, value) {
-	var time = document.createElement('time');
-	time.id = id;
-	time.textContent = value;
-	time.onclick = function(e) {
-		changeTime(e.target.id, e.target.textContent);
-	};
-	return time;
+	var time = document.createElement('time')
+	time.id = id
+	time.textContent = value
+	time.onclick = e => changeTime(e.target.id, e.target.textContent)
+	return time
 }
 
 async function toggleScheduleDay(day) {

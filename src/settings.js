@@ -15,14 +15,16 @@ findSetting = function(id) {
 
 class Setting
 {
+	#element
+
 	constructor(id, name, description, value, category, type) 
 	{
-		this.Id = id;
-		this.Name = name;
-		this.Description = description;
-		this.Value = value;
-		this.Type = type;
-		this.Category = category;
+		this.Id = id
+		this.Name = name
+		this.Description = description
+		this.Value = value
+		this.Type = type
+		this.Category = category
 	}
 	
 	#generateToggle(container) {
