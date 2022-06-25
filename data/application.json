@@ -346,63 +346,64 @@
       "Triggers": ["away-now-maximum", "cannot-work-day-minimum"]
     }
   },
-  "Visualizations": [
-		{
-			"Type": "BAN",
-			"ContainerId": "hoursStanding",
-			"Params": {
-        "name": "Standing",
-        "valueKey": "states.standing.total",
-        "formatter": "toHM"
+  "Visualizations": {
+    "ban-container": [
+      {
+        "Type": "BAN",
+        "Params": {
+          "name": "Standing",
+          "valueKey": "states.standing.total",
+          "formatter": "toHM"
+        }
+      },
+      {
+        "Type": "BAN",
+        "Params": {
+          "name": "Working",
+          "valueKey": "states.notAbsent.total",
+          "formatter": "toHM"
+        }
+      },
+      {
+        "Type": "BAN",
+        "Params": {
+          "name": "Remaining Today",
+          "valueKey": "schedule.day.balance",
+          "formatter": "toHM"
+        }
       }
-		},
-		{
-			"Type": "BAN",
-			"ContainerId": "hoursWorked",
-			"Params": {
-        "name": "Working",
-        "valueKey": "states.notAbsent.total",
-        "formatter": "toHM"
+    ],
+    "graph-container": [
+      {
+        "Type": "Donut",
+        "Params": ["Stand Progress", "Hours", ["states.standing.total", "parameters.standDayMinimum.timespan"]]
+      },
+      {
+        "Type": "Donut",
+        "Params": ["Work Progress", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
+      },
+      {
+        "Type": "Bar",
+        "Params": ["Breaks Taken", "activity", "parameters.absentNowDuration"]
       }
-		},
-		{
-			"Type": "BAN",
-			"ContainerId": "hoursLeftToEOD",
-      "Params": {
-        "name": "Until End of Day",
-        "valueKey": "schedule.day.balance",
-        "formatter": "toHM"
+    ],
+		"timeline-container": [
+      {
+        "Type": "State",
+        "Params": {
+          "valueKey": "state.assumed",
+          "compareToKey": "state.raw",
+          "subtitleKey": "state.duration",
+          "formatter": "toHMS"
+        }
+      },
+      {
+        "Type": "Clock",
+        "Params": {
+          "valueKey": "timestamp",
+          "formatter": "toLocalHMTT"
+        }
       }
-		},
-		{
-			"Type": "Donut",
-			"ContainerId": "workProgress",
-			"Params": ["Work Day Progress", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
-		},
-		{
-			"Type": "Donut",
-			"ContainerId": "standProgress",
-			"Params": ["Stand Progress", "Hours", ["states.standing.total", "parameters.standDayMinimum.timespan"]]
-		},
-		{
-			"Type": "Bar",
-			"ContainerId": "breaksTaken",
-			"Params": ["Breaks Taken", "activity", "parameters.absentNowDuration"]
-		},
-		{
-			"Type": "State",
-			"ContainerId": "stateTimer",
-			"Params": {
-        "valueKey": "state.assumed",
-        "compareToKey": "state.raw",
-        "subtitleKey": "state.duration",
-        "formatter": "toHMS"
-      }
-		},
-		{
-			"Type": "Clock",
-			"ContainerId": "currentTime",
-			"Params": []
-		}
-	]
+    ]
+  }
 }

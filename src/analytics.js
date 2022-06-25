@@ -11,6 +11,7 @@ const vizPalette = [
 const formatters = {
 	toHM: (ms) => new Date(ms).toISOString().substring(11, 16),
 	toHMS: (ms) => new Date(ms).toISOString().substring(11, 19),
+	toLocalHMTT: (ms) => new Date(ms).toLocaleTimeString('en-us', {hour: '2-digit', minute: '2-digit'})
 }
 
 class BAN
@@ -46,7 +47,7 @@ class Donut
 	}
 	
 	redraw(data) {
-		const [current, remaining] = this.ValueKeys.map(k => data[k])
+		const [current, total] = this.ValueKeys.map(k => data[k])
 		const size = Math.min(
 			this.DonutElement.offsetHeight,
 			this.DonutElement.offsetWidth
@@ -58,14 +59,14 @@ class Donut
 				.attr('height', size)
 			.select('g')
 			.selectAll('path')
-			.data(d3.pie()([current, remaining]))
+			.data(d3.pie()([current, total - current]))
 			.join('path')
 				.attr('d', d3.arc().innerRadius(size/4).outerRadius(size/2))
 				.attr('fill', (_, i) => vizPalette[i])
 
 		this.Element.setAttribute('data-name', this.Name)
 		this.LabelElement.setAttribute('data-current', current.toFixed(2))
-		this.LabelElement.setAttribute('data-total', (current + remaining).toFixed(2))
+		this.LabelElement.setAttribute('data-total', total.toFixed(2))
 		this.LabelElement.setAttribute('data-unit', this.Unit)
 	}
 }
@@ -189,13 +190,14 @@ class State
 
 class Clock
 {
-	constructor(domContainer) {
+	constructor(domContainer, {valueKey, formatter}) {
 		this.Element = domContainer
-		setInterval(() => this.redraw(), 1000)
+		this.valueKey = valueKey
+		this.formatFn = formatters[formatter]
 	}
 	
 	redraw(data) {
-		this.Element.setAttribute('data-time', getNow().toLocaleTimeString())
+		this.Element.setAttribute('data-time', this.formatFn(data[this.valueKey]))
 	}
 }
 
@@ -203,12 +205,21 @@ class VisualizationManager
 {
 	#vizClasses = {BAN, Donut, Bar, State, Clock}
 
-	constructor(vizConfig) 
+	constructor(container, vizConfig) 
 	{
-		this.visualizations = vizConfig.map(v => {
-			const el = document.getElementById(v.ContainerId)
-			return new this.#vizClasses[v.Type](el, v.Params)
-		})
+		this.visualizations = []
+		for (const group in vizConfig) {
+			const div = document.createElement('div')
+			div.classList.add(group)
+			container.appendChild(div)
+
+			for (const v of vizConfig[group]) {
+				const el = document.createElement('viz')
+				el.classList.add(v.Type.toLowerCase())
+				div.appendChild(el)
+				this.visualizations.push(new this.#vizClasses[v.Type](el, v.Params))
+			}
+		}
 	}
 
 	setData(data) {
