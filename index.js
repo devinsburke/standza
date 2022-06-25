@@ -13,8 +13,8 @@ function changeTab(tabName) {
 }
 
 window.addEventListener('DOMContentLoaded', async () => {
-	AppConfig = await AppConfiguration.fromJson("./data/application.json")
-	UserConfig = await UserConfiguration.fromJson("./data/user.json")
+	AppConfig = await AppConfiguration.fromJson('./data/application.json', standzaAPI.writeFile)
+	UserConfig = await UserConfiguration.fromJson('./data/user.json', standzaAPI.writeFile)
 	setupSchedule(UserConfig.schedule)
 	setupSettings()
 
@@ -32,7 +32,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 	)
 	await camera.setupCamera()
 
-	const vizManager = new VisualizationManager(AppConfig.Visualizations)
+	const vizManager = new VisualizationManager(
+		document.getElementById('visualization-container'),
+		AppConfig.Visualizations
+	)
 	const rules = new RuleEngine(
 		UserConfig.goals,
 		AppConfig.Goals,
