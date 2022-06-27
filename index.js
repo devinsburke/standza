@@ -1,8 +1,23 @@
-var tabs = ['home','progress','calendar','settings','preview']
-var AppConfig = null
-var UserConfig = null
+let tabs = ['home','progress','calendar','settings','preview']
+let AppConfig = null
+let UserConfig = null
 
 const getNow = () => new Date(Date.now())
+
+function jor(parent, fn, container) {
+	container ??= {}
+	fn(tag => ({
+		element: document.createElement(tag),
+		container: container,
+		text(t, b=true) { if (b) this.element.textContent = t; return this },
+		class(c, b=true) { if (b) this.element.classList.add(c); return this },
+		id(i, b=true) { if (b) this.element.id = i; return this },
+		attr(k, v, b=true) { if (b) this.element.setAttribute(k, v); return this },
+		set (k, v, b=true) { if (b) this.element[k] = v; return this },
+		refer(id, b=true) { if (b) this.container[id] = this.element; return this },
+		children(...c) { c.forEach(i => this.element.appendChild(i.element)); return this }
+	})).forEach(e => parent.appendChild(e.element))
+}
 
 function changeTab(tabName) {
 	document.querySelectorAll('.selected-tab').forEach(b => b.classList.remove('selected-tab'))
@@ -15,7 +30,11 @@ function changeTab(tabName) {
 window.addEventListener('DOMContentLoaded', async () => {
 	AppConfig = await AppConfiguration.fromJson('./data/application.json', standzaAPI.writeFile)
 	UserConfig = await UserConfiguration.fromJson('./data/user.json', standzaAPI.writeFile)
-	setupSchedule(UserConfig.schedule)
+	const scheduleController = new ScheduleController(
+		document.getElementById('schedule-list'),
+		UserConfig.schedule
+	)
+	
 	setupSettings()
 
 	const audioPlayer = new AudioPlayer(
