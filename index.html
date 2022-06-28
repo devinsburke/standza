@@ -8,15 +8,7 @@
         <title>Standza</title>
     </head>
     <body>
-        <div id="drawer">
-            <ul>
-                <li class="drawer-option selected-tab" onClick="changeTab('home')" id="tab-home"><i class="material-icons">home</i></li>
-                <li class="drawer-option" onClick="changeTab('progress')" id="tab-progress"><i class="material-icons">check</i></li>
-                <li class="drawer-option" onClick="changeTab('calendar')" id="tab-calendar"><i class="material-icons">date_range</i></li>
-                <li class="drawer-option" onClick="changeTab('settings')" id="tab-settings"><i class="material-icons">settings</i></li>
-                <li class="drawer-option" onClick="changeTab('preview')" id="tab-preview"><i class="material-icons">camera</i></li>
-            </ul>
-        </div>
+        <div id="drawer"></div>
         <div id="content-container">
             <div id="home">
                 <div id="visualization-container"></div>
@@ -50,6 +42,7 @@
         </div>
         <div id="audio-container"></div>
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="./src/drawer.js"></script>
         <script src="./src/store.js"></script>
         <script src="./src/summary.js"></script>
         <script src="./src/schedule.js"></script>

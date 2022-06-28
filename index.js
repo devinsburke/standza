@@ -1,4 +1,3 @@
-let tabs = ['home','progress','calendar','settings','preview']
 let AppConfig = null
 let UserConfig = null
 
@@ -20,17 +19,15 @@ function jor(parent, fn, container) {
 	return container
 }
 
-function changeTab(tabName) {
-	document.querySelectorAll('.selected-tab').forEach(b => b.classList.remove('selected-tab'))
-	document.getElementById('tab-' + tabName).classList.add('selected-tab')
-	const container = document.getElementById('content-container')
-	tabs.forEach(t => container.classList.remove(t))
-	container.classList.add(tabName)
-}
-
 window.addEventListener('DOMContentLoaded', async () => {
 	AppConfig = await AppConfiguration.fromJson('./data/application.json', standzaAPI.writeFile)
 	UserConfig = await UserConfiguration.fromJson('./data/user.json', standzaAPI.writeFile)
+	
+	const drawerComponent = new DrawerComponent(
+		document.getElementById('drawer'),
+		document.getElementById('content-container')
+	)
+	
 	const scheduleComponent = new ScheduleComponent(
 		document.getElementById('schedule-list'),
 		UserConfig.schedule
