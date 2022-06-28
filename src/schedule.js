@@ -1,29 +1,19 @@
 const keypadButtons = [
-	[
-		{text: 7, action: 'numberClick'},
-		{text: 8, action: 'numberClick'},
-		{text: 9, action: 'numberClick'},
-	],
-	[
-		{text: 4, action: 'numberClick'},
-		{text: 5, action: 'numberClick'},
-		{text: 6, action: 'numberClick'},
-	],
-	[
-		{text: 1, action: 'numberClick'},
-		{text: 2, action: 'numberClick'},
-		{text: 3, action: 'numberClick'},
-	],
-	[
-		{text: 'AM', action: 'ampmClick'},
-		{text: 0, action: 'numberClick'},
-		{text: 'PM', action: 'ampmClick'},
-	],
-	[
-		{text: 'hour', icon: 'arrow_left', action: 'arrowClick'},
-		{text: 'done', icon: 'done'},
-		{text: 'minute', icon: 'arrow_right', action: 'arrowClick'},
-	]
+	{text: 7, action: 'numberClick'},
+	{text: 8, action: 'numberClick'},
+	{text: 9, action: 'numberClick'},
+	{text: 4, action: 'numberClick'},
+	{text: 5, action: 'numberClick'},
+	{text: 6, action: 'numberClick'},
+	{text: 1, action: 'numberClick'},
+	{text: 2, action: 'numberClick'},
+	{text: 3, action: 'numberClick'},
+	{text: 'AM', action: 'ampmClick'},
+	{text: 0, action: 'numberClick'},
+	{text: 'PM', action: 'ampmClick'},
+	{text: 'hour', icon: 'arrow_left', action: 'arrowClick'},
+	{text: 'done', icon: 'done'},
+	{text: 'minute', icon: 'arrow_right', action: 'arrowClick'},
 ]
 
 class ScheduleComponent {
@@ -74,23 +64,14 @@ class KeypadComponent {
 					el('minute').refer('minute').set('onclick', () => this.arrowClick('minute')),
 					el('time-type').refer('ampm').set('onclick', () => this.ampmClick())
 				),
-				el('key-pad').children(...keypadButtons.map(row =>
-					el('row').children(...row.map(b =>
-						el('key').text(b.icon || b.text)
-							.class('material-icons', b.icon != null)
-							.refer('done', b.text == 'done')
-							.set('onclick', () => this[b.action](b.text), b.action)
-					))
+				el('key-pad').children(...keypadButtons.map(b =>
+					el('key').text(b.icon || b.text)
+						.class('material-icons', b.icon != null)
+						.refer('done', b.text == 'done')
+						.set('onclick', () => this[b.action](b.text), b.action)
 				))
 			)
 		])
-
-		// if (btn.icon) {
-		// 	const icon = document.createElement('i')
-		// 	icon.classList.add('material-icons')
-		// 	icon.textContent = btn.icon
-		// 	buttonEl.appendChild(icon)
-		// }
 	}
 
 	prompt(hour, minute, ampm) {
