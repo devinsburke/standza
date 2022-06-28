@@ -35,14 +35,14 @@ class ScheduleComponent {
 			el('li')
 			.class('selected', d.Enabled)
 			.set('onclick', e => {
-				if (e.target != e.currentTarget) return
-				d.Enabled = !d.Enabled
-				e.target.classList.toggle('selected', d.Enabled)
-				UserConfig.save() // TODO: Await
+				if (e.target == e.currentTarget) {
+					d.Enabled = !d.Enabled
+					e.target.classList.toggle('selected', d.Enabled)
+					UserConfig.save() // TODO: Await
+				}
 			})
 			.children(
 				el('span').text(d.Name),
-				el('flex'),
 				el('time').text(d.StartTime).set('onclick', e => this.timeClick(e.target, d, 'StartTime')),
 				el('time').text(d.EndTime).set('onclick', e => this.timeClick(e.target, d, 'EndTime'))
 			)
