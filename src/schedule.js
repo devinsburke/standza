@@ -1,159 +1,143 @@
 const keypadButtons = [
 	[
-		{text: 7, action: 'number'},
-		{text: 8, action: 'number'},
-		{text: 9, action: 'number'},
+		{text: 7, action: 'numberClick'},
+		{text: 8, action: 'numberClick'},
+		{text: 9, action: 'numberClick'},
 	],
 	[
-		{text: 4, action: 'number'},
-		{text: 5, action: 'number'},
-		{text: 6, action: 'number'},
+		{text: 4, action: 'numberClick'},
+		{text: 5, action: 'numberClick'},
+		{text: 6, action: 'numberClick'},
 	],
 	[
-		{text: 1, action: 'number'},
-		{text: 2, action: 'number'},
-		{text: 3, action: 'number'},
+		{text: 1, action: 'numberClick'},
+		{text: 2, action: 'numberClick'},
+		{text: 3, action: 'numberClick'},
 	],
 	[
-		{text: 'AM', action: 'ampm'},
-		{text: 0, action: 'number'},
-		{text: 'PM', action: 'ampm'},
+		{text: 'AM', action: 'ampmClick'},
+		{text: 0, action: 'numberClick'},
+		{text: 'PM', action: 'ampmClick'},
 	],
 	[
-		{icon: 'arrow_left', action: 'hour'},
-		{icon: 'done', action: 'done'},
-		{icon: 'arrow_right', action: 'minute'},
+		{text: 'hour', icon: 'arrow_left', action: 'arrowClick'},
+		{text: 'done', icon: 'done'},
+		{text: 'minute', icon: 'arrow_right', action: 'arrowClick'},
 	]
 ]
 
-class ScheduleController {
+class ScheduleComponent {
 	constructor(container, schedule) {
 		this.schedule = schedule
-		this.elements = {}
-		this.time_settings = {
-			current_time: '',
-			current_element: 'hour'
-		}
+		this.keypad = new KeypadComponent()
 
-		jor(container, el => this.schedule.Days.map(s => {
-			const name = s.Name.toLowerCase()
-			return el('li').id('schedule-' + name).class('selected', s.Enabled).children(
-				el('span').text(s.Name).set('onclick', _ => this.toggleScheduleDay(s.Name)),
+		jor(container, el => this.schedule.Days.map(d =>
+			el('li')
+			.class('selected', d.Enabled)
+			.set('onclick', e => {
+				if (e.target != e.currentTarget) return
+				d.Enabled = !d.Enabled
+				e.target.classList.toggle('selected', d.Enabled)
+				UserConfig.save() // TODO: Await
+			})
+			.children(
+				el('span').text(d.Name),
 				el('flex'),
-				el('time').id(name + '-start').text(s.StartTime).set('onclick', e => this.changeTime(e.target.id, e.target.textContent)),
-				el('time').id(name + '-end').text(s.EndTime).set('onclick', e => this.changeTime(e.target.id, e.target.textContent))
+				el('time').text(d.StartTime).set('onclick', e => this.timeClick(e.target, d, 'StartTime')),
+				el('time').text(d.EndTime).set('onclick', e => this.timeClick(e.target, d, 'EndTime'))
 			)
-		}))
+		))
 	}
 
-	async createKeyPad() {
-		const keyPad = document.createElement('key-pad')
+	async timeClick(btn, day, dayAttribute) {
+		const value = day[dayAttribute]
+		const hour = value.split(':')[0]
+		const minute = value.split(':')[1].split(' ')[0]
+		const ampm = value.split(':')[1].split(' ')[1]
 
-		for (const row of keypadButtons) {
-			const rowEl = document.createElement('row')
-			keyPad.appendChild(rowEl)
-			for (const btn of row) {
-				const buttonEl = document.createElement('key')
-				rowEl.appendChild(buttonEl)
-				buttonEl.textContent = btn.text
-				if (btn.icon) {
-					const icon = document.createElement('i')
-					icon.classList.add('material-icons')
-					icon.textContent = btn.icon
-					buttonEl.appendChild(icon)
-				}
+		const result = await this.keypad.prompt(hour, minute, ampm)
+		const newTime = result.hour + ':' + result.minute + ' ' + result.ampm
 
-				buttonEl.onclick = async _ => {
-					const currentField = this.time_settings.current_element
-
-					switch (btn.action) {
-						case 'ampm':
-							this.elements.timetype.textContent = btn.text
-							break
-
-						case 'number':
-							const range = currentField == 'hour' ? [1, 12] : [0, 59]
-							let value = parseInt(this.elements[currentField].textContent + btn.text)
-							if (value < range[0] || value > range[1])
-								value = btn.text
-							if (value < range[0] || value > range[1])
-								return
-
-							this.elements[currentField].textContent = value.toString().padStart(2, '0')
-							if (parseInt(value + '0') > range[1]) {
-								this.time_settings.current_element = 'minute'
-								this.elements.hour.classList.remove('active')
-								this.elements.minute.classList.add('active')
-							}
-							break
-
-						case 'hour':
-						case 'minute':
-							if (btn.action != currentField) {
-								this.time_settings.current_element = btn.action
-								this.elements.hour.classList.toggle('active')
-								this.elements.minute.classList.toggle('active')
-							}
-							break
-
-						case 'done':
-							var newTime = this.elements.hour.textContent + ':' + this.elements.minute.textContent + ' ' + this.elements.timetype.textContent
-							document.getElementById(this.time_settings.current_time).innerText = newTime
-							
-							var dayIndex = this.schedule.Days.findIndex(d => d.Name.toLowerCase() == this.time_settings.current_time.split('-')[0])
-							if (this.time_settings.current_time.split('-')[1] == 'start')
-								this.schedule.Days[dayIndex].StartTime = newTime
-							else
-								this.schedule.Days[dayIndex].EndTime = newTime
-							await UserConfig.save()
-							this.elements.modal.remove()
-					}
-				}
-			}
-		}
-
-		return keyPad
+		day[dayAttribute] = newTime
+		btn.textContent = newTime
+		UserConfig.save()
 	}
+}
 
-	async changeTime(id, value) {
-		var enabled = this.schedule.Days.find(s => s.Name.toLowerCase() == id.split('-')[0]).Enabled;
-		if (!enabled)
-			return
-
-		var hour = ''
-		var minute = ''
-		var type = 'AM'
-		if (value) {
-			hour = value.split(':')[0]
-			minute = value.split(':')[1].split(' ')[0]
-			type = value.split(':')[1].split(' ')[1]
-		}
-		
-		this.time_settings.current_time = id
-		this.time_settings.current_element = 'hour'
-
-		jor(document.body, el => [
-			el('modal').refer('modal').children(
+class KeypadComponent {
+	constructor() {
+		this.elements = jor(document.body, el => [
+			el('modal').refer('modal').class('hidden').children(
 				el('time-entry').children(
-					el('hour').text(hour).refer('hour').class('active'),
+					el('hour').refer('hour').set('onclick', () => this.arrowClick('hour')),
 					el('span').text(':'),
-					el('minute').text(minute).refer('minute'),
-					el('time-type').text(type).refer('timetype')
-				)
+					el('minute').refer('minute').set('onclick', () => this.arrowClick('minute')),
+					el('time-type').refer('ampm').set('onclick', () => this.ampmClick())
+				),
+				el('key-pad').children(...keypadButtons.map(row =>
+					el('row').children(...row.map(b =>
+						el('key').text(b.icon || b.text)
+							.class('material-icons', b.icon != null)
+							.refer('done', b.text == 'done')
+							.set('onclick', () => this[b.action](b.text), b.action)
+					))
+				))
 			)
-		], this.elements)
+		])
 
-		this.elements.modal.appendChild(await this.createKeyPad())
+		// if (btn.icon) {
+		// 	const icon = document.createElement('i')
+		// 	icon.classList.add('material-icons')
+		// 	icon.textContent = btn.icon
+		// 	buttonEl.appendChild(icon)
+		// }
 	}
 
-	async toggleScheduleDay(day) {
-		var index = this.schedule.Days.findIndex(s => s.Name == day)
-		if (index < 0)
+	prompt(hour, minute, ampm) {
+		this.elements.hour.textContent = hour
+		this.elements.hour.classList.add('active')
+		this.elements.minute.textContent = minute
+		this.elements.minute.classList.remove('active')
+		this.elements.ampm.textContent = ampm
+		this.datepart = 'hour'
+		this.elements.modal.classList.remove('hidden')
+
+		return new Promise(resolve => {
+			this.elements.done.onclick = () => {
+				this.elements.modal.classList.add('hidden')
+				resolve({
+					hour: this.elements.hour.textContent,
+					minute: this.elements.minute.textContent,
+					ampm: this.elements.ampm.textContent
+				})
+			}
+		})
+	}
+
+	ampmClick(value) {
+		this.elements.ampm.textContent = value || (this.elements.ampm.textContent == 'AM' ? 'PM' : 'AM')
+	}
+
+	arrowClick(value) {
+		if (this.datepart != value) {
+			this.datepart = value
+			this.elements.hour.classList.toggle('active', value == 'hour')
+			this.elements.minute.classList.toggle('active', value == 'minute')
+		}
+	}
+
+	numberClick(value) {
+		const range = this.datepart == 'hour' ? [1, 12] : [0, 59]
+		let num = parseInt(`${this.elements[this.datepart].textContent}${value}`)
+		if (num < range[0] || num > range[1])
+			num = value
+		if (num < range[0] || num > range[1])
 			return
-		this.schedule.Days[index].Enabled = !this.schedule.Days[index].Enabled
-		var element = document.getElementById('schedule-' + day.toLowerCase())
-		element.classList.toggle('selected', this.schedule.Days[index].Enabled)
-		
-		await UserConfig.save()
+
+		if (this.datepart == 'minute')
+			num = num.toString().padStart(2, '0') 
+		this.elements[this.datepart].textContent = num
+		if (parseInt(num + '0') > range[1])
+			this.arrowClick('minute')
 	}
 }
