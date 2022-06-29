@@ -1,7 +1,7 @@
 const vizRenderClass = 'rendered'
 const vizError = 'hsl(0deg 91% 63%)'
 const vizPalette = [
-	'hsl(216deg 49% 45%)',
+	'var(--accent-dark)',
 	'transparent',
 	'hsl(216deg 63% 85%)', 
 	'hsl(216deg 83% 47%)',
@@ -11,7 +11,8 @@ const vizPalette = [
 const formatters = {
 	toHM: (ms) => new Date(ms).toISOString().substring(11, 16),
 	toHMS: (ms) => new Date(ms).toISOString().substring(11, 19),
-	toLocalHMTT: (ms) => new Date(ms).toLocaleTimeString('en-us', {hour: '2-digit', minute: '2-digit'})
+	toLocalHMTT: (ms) => new Date(ms).toLocaleTimeString('en-us', {hour: '2-digit', minute: '2-digit'}),
+	toUnit: (ms, unit) => unit == 'Hours' ? ms / 360000 : ms / 60000
 }
 
 class BAN
@@ -65,8 +66,8 @@ class Donut
 				.attr('fill', (_, i) => vizPalette[i])
 
 		this.Element.setAttribute('data-name', this.Name)
-		this.LabelElement.setAttribute('data-current', current.toFixed(2))
-		this.LabelElement.setAttribute('data-total', total.toFixed(2))
+		this.LabelElement.setAttribute('data-current', formatters.toUnit(current, this.Unit).toFixed(2))
+		this.LabelElement.setAttribute('data-total', formatters.toUnit(total, this.Unit).toFixed(2))
 		this.LabelElement.setAttribute('data-unit', this.Unit)
 	}
 }

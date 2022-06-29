@@ -19,7 +19,6 @@
 }
 
 viz {
-	background: var(--card-background);
 	border-radius: 0.8em;
 	box-shadow: 0 0 0.1em 0 #0000004d;
 	display: flex;
@@ -35,7 +34,6 @@ viz {
 	}
 		viz.ban::before {
 			content: attr(data-value);
-			background: rgba(0,0,0,0.3);
 			padding: 0 0.5em;
 			height: 100%;
 			align-items: center;
@@ -50,7 +48,8 @@ viz {
 	
 	viz.donut,
 	viz.bar {
-		background: var(--primary-dark);
+		color: var(--font-light);
+		background: var(--accent-light);
 	}
 		viz.donut::before,
 		viz.bar > span {
@@ -99,9 +98,8 @@ viz {
 		transform-box: fill-box;
 	}
 	donut path {
-		stroke: #00000087;
+		stroke: var(--accent-dark);
 		stroke-width: 1px;
-		opacity: 0.7;
 	}
 	bar > svg > g > g > path,
 	g > line {
