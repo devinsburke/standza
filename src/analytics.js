@@ -32,43 +32,35 @@ class BAN
 }
 
 class Donut 
-{	
-	constructor(domContainer, [name, unit, valueKeys])
+{
+	constructor(container, [name, unit, valueKeys])
 	{
 		this.Name = name
 		this.Unit = unit
 		this.ValueKeys = valueKeys
-		this.Element = domContainer
-		
-		this.LabelElement = document.createElement('span')
-		this.DonutElement = document.createElement('donut')
-		this.DonutElement.appendChild(this.LabelElement)
-		this.Element.appendChild(this.DonutElement)
-		d3.select(this.DonutElement).append('svg').append('g')
+		this.elements = jor(container, el => [
+			el('donut').children(
+				el('svg').attr('viewBox', '0 0 1 0.5').children(
+					el('text').class('actual').refer('actual'),
+					el('text').class('unit').refer('unit'),
+					el('text').class('target-label').text('of'),
+					el('text').class('target').refer('target'),
+					el('circle'),
+					el('circle')
+				)
+			)
+		], {container})
 	}
 	
 	redraw(data) {
 		const [current, total] = this.ValueKeys.map(k => data[k])
-		const size = Math.min(
-			this.DonutElement.offsetHeight,
-			this.DonutElement.offsetWidth
-		)
-
-		d3.select(this.DonutElement)
-			.select('svg')
-				.attr('width', size)
-				.attr('height', size)
-			.select('g')
-			.selectAll('path')
-			.data(d3.pie()([current, total - current]))
-			.join('path')
-				.attr('d', d3.arc().innerRadius(size/4).outerRadius(size/2))
-				.attr('fill', (_, i) => vizPalette[i])
-
-		this.Element.setAttribute('data-name', this.Name)
-		this.LabelElement.setAttribute('data-current', formatters.toUnit(current, this.Unit).toFixed(2))
-		this.LabelElement.setAttribute('data-total', formatters.toUnit(total, this.Unit).toFixed(2))
-		this.LabelElement.setAttribute('data-unit', this.Unit)
+		const style = this.elements.container.style
+		this.elements.actual.textContent = formatters.toHM(current)//.toFixed(2)
+		this.elements.target.textContent = 'target: ' + formatters.toHM(total)//.toFixed(2)
+		this.elements.unit.textContent = ''//this.Unit.toLowerCase()
+		style.setProperty('--data-name', "'" + this.Name + "'")
+		style.setProperty('--data-current-int', current)
+		style.setProperty('--data-total-int', total)
 	}
 }
 
