@@ -64,6 +64,57 @@ class Donut
 	}
 }
 
+class Gantt {
+	constructor(container, {tasks, dataKey}) {
+		this.tasks = tasks
+		this.statuses = {
+			'success': 'success',
+			'failure': 'failure',
+			'inprocess': 'inprocess',
+			'neutral': 'neutral'
+		}
+		this.dataKey = dataKey
+
+		this.elements = jor(container, el => [
+			el('gantt').children(
+				el('svg').refer('svg')
+			)
+		], {container})
+	}
+
+	redraw(data) {
+		data = data[this.dataKey]
+		const timeRange = [new Date(data[0].start.getTime() - 30 * 60 * 1000), new Date(data[data.length-1].end.getTime() + 30 * 60 * 1000)]
+
+		const svg = d3.select(this.elements.svg)
+		
+		const xMargin = 50
+		const yMargin = 20
+		
+		const width = 600
+		const height = 150
+		const xScale = d3.scaleTime().domain(timeRange).range([xMargin, width])
+		const xAxis = d3.axisBottom().scale(xScale).ticks(d3.timeHour)
+		svg.append('g')
+			.attr('transform', `translate(0,${height - yMargin})`)
+			.transition().call(xAxis)
+		
+		const yScale = d3.scaleBand().domain(['Standing','Absent','Sitting']).range([0, height - yMargin])
+		const yAxis = d3.axisLeft().scale(yScale).tickSize(0)
+		svg.append('g')
+			.attr('transform', `translate(${xMargin},0)`)
+			.transition().call(yAxis)
+
+		svg.selectAll('x').data(data).enter()
+			.append('g')
+			.attr('transform', d => `translate(${xScale(d.start)},${yScale(d.assumedState)})`)
+			.append('rect')
+			.attr('class', d => d.assumedState)
+			.attr('height', yScale.bandwidth())
+			.attr('width', d => xScale(d.end) - xScale(d.start))
+	}
+}
+
 class Bar 
 {
 	constructor(domContainer, [name, valueKey, errorKey])
@@ -196,7 +247,7 @@ class Clock
 
 class VisualizationManager
 {
-	#vizClasses = {BAN, Donut, Bar, State, Clock}
+	#vizClasses = {BAN, Donut, Gantt, State, Clock}
 
 	constructor(container, vizConfig) 
 	{

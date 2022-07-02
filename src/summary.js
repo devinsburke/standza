@@ -15,11 +15,10 @@ class Summary {
         for (const m of [...moments, {timestamp: getNow()}])
             if (f.assumedState != m.assumedState) {
                 const prefix = `states.${f.assumedState.toLowerCase()}`
-                const duration = m.timestamp - f.timestamp
                 this[`${prefix}.total`] ??= 0
-                this[`${prefix}.total`] += duration
+                this[`${prefix}.total`] += m.timestamp - f.timestamp
                 this[`${prefix}.last`] = m.timestamp
-                this['activity'].push({ state: f.assumedState, start: f.timestamp, end: m.timestamp, duration })
+                this['activity'].push({ state: f.assumedState, start: f.timestamp, end: m.timestamp })
                 f = m
             }
     }
