@@ -67,150 +67,53 @@ class Donut
 class Gantt {
 	constructor(container, {tasks, dataKey}) {
 		this.tasks = tasks
-		this.statuses = {
-			'success': 'success',
-			'failure': 'failure',
-			'inprocess': 'inprocess',
-			'neutral': 'neutral'
-		}
 		this.dataKey = dataKey
 
 		this.elements = jor(container, el => [
-			el('gantt').children(
-				el('svg').refer('svg')
-			)
+			el('svg').attr('viewBox', '0 0 600 150').refer('svg')
 		], {container})
+
+		this.xScale = d3.scaleTime()
+		this.yScale = d3.scaleBand().domain(['Standing','Absent','Sitting'])
+		this.xAxis = d3.axisBottom().scale(this.xScale).ticks(d3.timeHour)		
+		this.yAxis = d3.axisLeft().scale(this.yScale).tickSize(0)
+
+		const svg = d3.select(this.elements.svg)
+		svg.append('g').attr('class', 'xaxis')
+		svg.append('g').attr('class', 'yaxis')
+		svg.append('g').attr('class', 'data')
 	}
 
 	redraw(data) {
-		data = data[this.dataKey]
-		const timeRange = [new Date(data[0].start.getTime() - 30 * 60 * 1000), new Date(data[data.length-1].end.getTime() + 30 * 60 * 1000)]
-
 		const svg = d3.select(this.elements.svg)
+		const activity = data[this.dataKey]
 		
 		const xMargin = 50
 		const yMargin = 20
-		
 		const width = 600
 		const height = 150
-		const xScale = d3.scaleTime().domain(timeRange).range([xMargin, width])
-		const xAxis = d3.axisBottom().scale(xScale).ticks(d3.timeHour)
-		svg.append('g')
+
+		const startTime = Math.min(activity[0].start, data['schedule.day.start'])
+		const endTime = Math.max(activity[activity.length-1].end, data['schedule.day.end'])
+
+		this.xScale.domain([startTime, endTime + 1000 * 60 * 30])
+		this.xScale.range([xMargin, width])
+		svg.select('.xaxis')
 			.attr('transform', `translate(0,${height - yMargin})`)
-			.transition().call(xAxis)
+			.transition().call(this.xAxis)
 		
-		const yScale = d3.scaleBand().domain(['Standing','Absent','Sitting']).range([0, height - yMargin])
-		const yAxis = d3.axisLeft().scale(yScale).tickSize(0)
-		svg.append('g')
+		this.yScale.range([0, height - yMargin])
+		svg.select('.yaxis')
 			.attr('transform', `translate(${xMargin},0)`)
-			.transition().call(yAxis)
-
-		svg.selectAll('x').data(data).enter()
-			.append('g')
-			.attr('transform', d => `translate(${xScale(d.start)},${yScale(d.assumedState)})`)
+			.transition().call(this.yAxis)
+ 
+		svg.select('.data').selectAll('rect').remove()
+		svg.select('.data').selectAll('rect').data(activity).enter()
 			.append('rect')
-			.attr('class', d => d.assumedState)
-			.attr('height', yScale.bandwidth())
-			.attr('width', d => xScale(d.end) - xScale(d.start))
-	}
-}
-
-class Bar 
-{
-	constructor(domContainer, [name, valueKey, errorKey])
-	{
-		this.Element = domContainer
-		this.Name = name
-		this.ValueKey = valueKey
-		this.ErrorKey = errorKey
-		this.Values = {}
-		
-		var nameElement = document.createElement('span');
-		nameElement.textContent = this.Name;
-		this.Element.appendChild(nameElement);
-		var containerElement = document.createElement('bar');
-		containerElement.id = this.Element.id + '-bar';
-		this.Element.appendChild(containerElement);
-		this.#createBar();
-	}
-	
-	redraw(visualizationData) {
-		return // TODO: Fix.
-		this.Values = visualizationData[this.ValueKey];
-		this.ErrorValue = visualizationData[this.ErrorKey];
-	
-		var bar = this.Element.querySelectorAll('bar')[0];
-		var svg = bar.querySelectorAll('svg')[0];
-		svg.remove();
-		this.#createBar();
-
-		var s = this.Element.querySelectorAll('svg')[0];
-		if (this.Values)
-			s.classList.remove('hidden');
-	}
-	
-	#createBar() {
-		return // TODO: Fix.
-		var bar = this.Element.querySelectorAll('bar')[0];
-		var height = bar.offsetHeight - 50;
-		var width = bar.offsetWidth;
-		var margin = {top: 10, right: 10, bottom: 40, left: 30};
-		
-		var svg = d3.select('#' + this.Element.id + '-bar')
-			.append("svg")
-				.attr("width", width + margin.left + margin.right)
-				.attr("height", height + margin.top + margin.bottom)
-			.append("g")
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-				
-		var x = d3.scaleBand()
-			.range([ 0, width ])
-			.domain(Object.values(this.Values).map(y => {return Object.keys(y)[0]}))
-			.padding(0.2);
-		
-		svg.append("g")
-			.attr("transform", "translate(0," + height + ")")
-				.call(d3.axisBottom(x))
-				.selectAll("text")
-			.attr("transform", "translate(-10,0)rotate(-45)")
-				.style("text-anchor", "end")
-				.style("fill", "white");
-				
-		var max = Object.values(this.Values).map(y => {return Object.values(y)[0]}).sort((a,b)=>a-b).reverse()[0];
-		var thresholdValue = this.ErrorValue ?? max + 1;
-		
-		var y = d3.scaleLinear()
-			.domain([0, max])
-			.range([ height, 0]);
-		svg.append("g")
-			.call(d3.axisLeft(y));
-					
-		var parsedValues = [];
-		for (var v in this.Values) {
-			var output = {};
-			output['time'] = Object.keys(this.Values[v])[0];
-			output['value'] = Object.values(this.Values[v])[0];
-			if (output['value'] > thresholdValue)
-				output['color'] = vizError;
-			else 
-				output['color'] = vizPalette[0];
-			parsedValues.push(output);
-		};
-							
-		svg.selectAll("x")
-			.data(parsedValues)
-			.enter()
-			.append("rect")
-				.attr("x", function(d) { return x(d['time']); })
-				.attr("y", function(d) { return y(d['value']); })
-				.attr("width", x.bandwidth())
-				.attr("height", function(d) { return height - y(d['value']); })
-				.attr("fill", function(d) { return d['color']; });
-
-		this.Element.classList.add(vizRenderClass);
-		var s = this.Element.querySelectorAll('svg')[0];
-		if (Object.entries(this.Values).length == 0)
-			s.classList.add('hidden');
+			.attr('transform', d => `translate(${this.xScale(d.start)},${this.yScale(d.state)})`)
+			.attr('class', d => d.state)
+			.attr('height', this.yScale.bandwidth())
+			.attr('width', d => this.xScale(d.end) - this.xScale(d.start))
 	}
 }
 

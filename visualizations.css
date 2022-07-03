@@ -1,14 +1,21 @@
-#visualization-container {
+.viz-container {
 	width: 100%;
 	height: 100%;
+	display: flex;
+	gap: 0.5em;
+	flex-direction: column;
 }
-	#visualization-container > * {
+	.viz-container > * {
+		align-items: center;
 		display: flex;
-		flex: 1 1 0;
-		user-select: none;
+		gap: 2em;
 	}
 
-.ban-container {
+	.events-container {
+		flex-grow: 1;
+	}
+
+/* .ban-container {
 	height: 16.5%;
 }
 .graph-container {
@@ -16,7 +23,7 @@
 }
 .timeline-container {
 	height: 16.5%;
-}
+} */
 
 viz {
 	xborder-radius: 0.8em;
@@ -24,7 +31,6 @@ viz {
 	display: flex;
 	flex: 1 1 0;
 	flex-flow: column;
-	margin: 0.5em;
 	xpadding: 0.5em;
 }
 	viz.ban {
@@ -46,59 +52,44 @@ viz {
 			padding-left: 1em;
 		}
 	
-	viz.donut {
-		xcolor: var(--font-light);
-		xbackground: var(--accent-light);
+	viz.donut::before {
+		content: var(--data-name, ' ');
+		white-space: pre;
+		margin-bottom: 0.5em;
+		text-align: center;
 	}
-		viz.donut::before {
-			content: var(--data-name, ' ');
-			white-space: pre;
-			margin-bottom: 0.5em;
-			text-align: center;
-		}
-		
-	viz.donut donut {
-		position: relative;
+
+	viz.donut svg circle {
+		clip-path: circle();
+		cx: 0.5;
+		cy: 0.5;
+		fill: none;
+		r: 0.5;
+		stroke: #00000010;
+		stroke-width: 15%;
 	}
-		viz.donut donut svg circle {
-			clip-path: circle();
-			cx: 0.5;
-			cy: 0.5;
-			fill: none;
-			r: 0.5;
-			stroke: #00000010;
+		viz.donut svg circle:last-child {
+			stroke: var(--accent-dark);
+			stroke-dasharray: calc(var(--data-current-int, 0) / var(--data-total-int, 1) * 3.14/2 + 3.14/2) 3.14;
 			stroke-width: 15%;
+			transform-origin: 50% 25%;
+			transform: rotate(0deg);
 		}
-			viz.donut donut svg circle:last-child {
-				stroke: var(--accent-dark);
-				stroke-dasharray: calc(var(--data-current-int, 0) / var(--data-total-int, 1) * 3.14/2 + 3.14/2) 3.14;
-				stroke-width: 15%;
-				transform-origin: 50% 25%;
-				transform: rotate(0deg);
-			}
-		viz.donut donut span {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			font-size: 0.75em;
-			text-align: center;
+	viz.donut text {
+		fill: var(--accent-dark);
+		font-size: 0.5%;
+	}
+		viz.donut text.actual {
+			font-size: 1%;
+			text-anchor: middle;
+			transform: translate(50%, 70%);
 		}
-		viz.donut donut text {
-			fill: var(--accent-dark);
-			font-size: 0.5%;
+		viz.donut text.target {
+			text-anchor: middle;
+			opacity: 0.5;
+			transform: translate(50%, 95%);
 		}
-			viz.donut donut text.actual {
-				font-size: 1%;
-				text-anchor: middle;
-				transform: translate(50%, 70%);
-			}
-			viz.donut donut text.target {
-				text-anchor: middle;
-				opacity: 0.5;
-				transform: translate(50%, 95%);
-			}
-	
+
 	viz.state, viz.clock {
 		align-items: center;
 		flex-flow: row;
@@ -130,3 +121,4 @@ viz {
 	viz.gantt .Absent { fill: #eee; rx: 1%; ry: 1%; }
 	viz.gantt .Sitting { fill: blue; rx: 1%; ry: 1%; }
 	viz.gantt .Standing { fill: red; rx: 1%; ry: 1%; }
+	viz.gantt svg {  }
