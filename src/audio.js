@@ -1,4 +1,4 @@
-class AudioPlayer {
+class AudioComponent {
     #list = []
     #playing = false
 

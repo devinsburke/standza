@@ -46,11 +46,11 @@ class Parameter {
 class RuleEngine {
     #triggerHolds = {}
 
-    constructor(goals, goalDefinitions, triggerDefinitions, audioPlayer) {
+    constructor(goals, goalDefinitions, triggerDefinitions, audioComponent) {
         this.goals = goals
         this.goalDefinitions = goalDefinitions
         this.triggerDefinitions = triggerDefinitions
-        this.audioPlayer = audioPlayer
+        this.audioComponent = audioComponent
     }
 
     run(summary) {
@@ -64,7 +64,7 @@ class RuleEngine {
                         break
                     delete this.#triggerHolds[t]
                 } else if (successes == trigger.Conditions.length) {
-                    this.audioPlayer.play(trigger.Alert)
+                    this.audioComponent.play(trigger.Alert)
                     // TODO: Alerts.
                     this.#triggerHolds[t] = true
                     break
