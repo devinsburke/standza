@@ -7,16 +7,16 @@ window.addEventListener('DOMContentLoaded', async () => {
 	AppConfig = await AppConfiguration.fromJson('./data/application.json', standzaAPI.writeFile)
 	UserConfig = await UserConfiguration.fromJson('./data/user.json', standzaAPI.writeFile)
 	
-	const drawerComponent = new DrawerComponent(document.body, AppConfig.tabs)
-	
-	const scheduleComponent = new ScheduleComponent(
-		document.getElementById('schedule-list'),
-		UserConfig.schedule
-	)
+	document.body.classList.add('loading')
 	
 	setupSettings()
 
-	const audioPlayer = new AudioPlayer(document.body)
+	const drawer = new DrawerComponent(document.body, AppConfig.tabs)
+	const schedule = new ScheduleComponent(
+		document.getElementById('schedule-list'),
+		UserConfig.schedule
+	)
+	const audio = new AudioComponent(document.body)
 
 	const camera = new CameraProcessor(
 		'video',
@@ -34,7 +34,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		UserConfig.goals,
 		AppConfig.Goals,
 		AppConfig.Triggers,
-		audioPlayer
+		audio
 	)
 
 	const stateManager = new StateManager(
@@ -48,4 +48,5 @@ window.addEventListener('DOMContentLoaded', async () => {
 	stateManager.hooks.push(s => rules.run(s))
 	stateManager.hooks.push(s => vizManager.setData(s))
 	await stateManager.run()
+	document.body.classList.remove('loading')
 })

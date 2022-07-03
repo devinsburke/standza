@@ -30,6 +30,39 @@ html, body {
 	margin: 0;
 }
 
+#loading {
+	align-items: center;
+	background: var(--background-dark);
+	color: var(--background-light);
+	display: flex;
+	font-size: 5em;
+	flex-direction: row;
+	gap: 0.3em;
+	height: 100vh;
+	opacity: 0;
+	position: fixed;
+	transition: ease 2s;
+	visibility: hidden;
+	width: 100vw;
+}
+#loading > span {
+	flex: 1 1 auto;
+	line-height: 0;
+}
+#loading > span:first-child {
+	text-align: right;
+}
+#loading svg { 
+	fill: var(--accent-light);
+	height: 1.25em;
+}
+
+.loading #loading {
+	visibility: visible;
+	opacity: 1;
+	transition: none;
+}
+
 ol, ul {
 	list-style-type: none;
 	padding: 0;
