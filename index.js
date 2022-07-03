@@ -16,11 +16,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 	
 	setupSettings()
 
-	const audioPlayer = new AudioPlayer(
-		document.getElementById('audio-container'),
-		'./audio/${soundId}.mp3'
-	)
-	audioPlayer.buildChime('.chime')
+	const audioPlayer = new AudioPlayer(document.body)
 
 	const camera = new CameraProcessor(
 		'video',

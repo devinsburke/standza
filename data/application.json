@@ -50,7 +50,8 @@
           "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
-      "Alert": "Congratulations! You have finished your work day."
+      "Alert": ["./audio/.chime.mp3", "./audio/worked-day-minimum.mp3"],
+      "AlertText": "Congratulations! You have finished your work day."
     },
     "stood-day-minimum": {
       "Conditions": [
@@ -70,7 +71,8 @@
           "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
-      "Alert": "Congratulations! You stood for {} today. You may now sit down."
+      "Alert": ["./audio/.chime.mp3", "./audio/stood-day-minimum.mp3"],
+      "AlertText": "Congratulations! You stood for {} today. You may now sit down."
     },
     "cannot-work-day-minimum": {
       "Conditions": [
@@ -85,7 +87,8 @@
           "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
-      "Alert": "Attention. You will not finish working on time unless you stay at your desk for the rest of the day."
+      "Alert": ["./audio/.chime.mp3", "./audio/cannot-work-day-minimum.mp3"],
+      "AlertText": "Attention. You will not finish working on time unless you stay at your desk for the rest of the day."
     },
     "failed-work-day-minimum": {
       "Conditions": [
@@ -105,7 +108,8 @@
           "Comparison": 0
         }
       ],
-      "Alert": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when your have met your set hours."
+      "Alert": ["./audio/.chime.mp3", "./audio/failed-work-day-minimum.mp3"],
+      "AlertText": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when your have met your set hours."
     },
     "failed-stand-day-minimum": {
       "Conditions": [
@@ -130,7 +134,8 @@
           "Comparison": 0
         }
       ],
-      "Alert": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration."
+      "Alert": ["./audio/.chime.mp3", "./audio/failed-stand-day-minimum.mp3"],
+      "AlertText": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration."
     },
     "end-day-clock": {
       "Conditions": [
@@ -150,7 +155,8 @@
           "Comparison": 0
         }
       ],
-      "Alert": "Congratulations, it is now after hours. That means your work day is over."
+      "Alert": ["./audio/.chime.mp3", "./audio/end-day-clock.mp3"],
+      "AlertText": "Congratulations, it is now after hours. That means your work day is over."
     },
     "stand-now-timer": {
       "Conditions": [
@@ -185,7 +191,8 @@
           "Comparison": "parameters.standFrequency.timespan"
         }
       ],
-      "Alert": "It's time to stand!"
+      "Alert": ["./audio/.chime.mp3", "./audio/stand-now-timer.mp3"],
+      "AlertText": "It's time to stand!"
     },
     "stand-now-maximum": {
       "Conditions": [
@@ -220,7 +227,8 @@
           "Comparison": "parameters.standNowDuration.timespan"
         }
       ],
-      "Alert": "You may now sit down."
+      "Alert": ["./audio/.chime.mp3", "./audio/stand-now-maximum.mp3"],
+      "AlertText": "You may now sit down."
     },
     "cannot-stand-day-minimum": {
       "Conditions": [
@@ -240,7 +248,8 @@
           "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
-      "Alert": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day."
+      "Alert": ["./audio/.chime.mp3", "./audio/cannot-stand-day-minimum.mp3"],
+      "AlertText": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day."
     },
     "away-now-timer": {
       "Conditions": [
@@ -275,7 +284,8 @@
           "Comparison": "parameters.awayFrequency.timespan"
         }
       ],
-      "Alert": "It's time to take a break!"
+      "Alert": ["./audio/.chime.mp3", "./audio/away-now-timer.mp3"],
+      "AlertText": "It's time to take a break!"
     },
     "away-now-maximum": {
       "Conditions": [
@@ -305,7 +315,8 @@
           "Comparison": "parameters.absentNowDuration.timespan"
         }
       ],
-      "Alert": "Attention. You should now return to your desk."
+      "Alert": ["./audio/.chime.mp3", "./audio/away-now-maximum.mp3"],
+      "AlertText": "Attention. You should now return to your desk."
     }
   },
   "Goals": {

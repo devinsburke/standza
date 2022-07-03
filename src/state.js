@@ -18,7 +18,6 @@ class StateManager {
         this.getRefreshRate = refreshRateFn
         this.getStateChangeTolerance = stateChangeToleranceFn
         this.hooks = []
-        this.log(getNow(), 'Absent')
     }
 
     log(timestamp, rawState) {

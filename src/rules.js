@@ -19,8 +19,9 @@ class Condition {
 }
 
 class Trigger {
-	constructor({Alert, Conditions}) {
+	constructor({Alert, AlertText, Conditions}) {
 		this.Alert = Alert
+        this.AlertText = AlertText
 		this.Conditions = Conditions ? Conditions.map(c => new Condition(c)) : []
 	}
 }
@@ -50,22 +51,20 @@ class RuleEngine {
         this.goalDefinitions = goalDefinitions
         this.triggerDefinitions = triggerDefinitions
         this.audioPlayer = audioPlayer
-        for (const k in this.triggerDefinitions)
-            this.audioPlayer.buildElement(k)
     }
 
     run(summary) {
         for (const g of this.goals) {
             for (const t of this.goalDefinitions[g].Triggers) {
-                const conditions = this.triggerDefinitions[t].Conditions
-                const successes = conditions.reduce((i, c) => i + c.evaluate(summary), 0)
+                const trigger = this.triggerDefinitions[t]
+                const successes = trigger.Conditions.reduce((i, c) => i + c.evaluate(summary), 0)
 
                 if (t in this.#triggerHolds) {
                     if (successes)
                         break
                     delete this.#triggerHolds[t]
-                } else if (successes == conditions.length) {
-                    this.audioPlayer.play(t)
+                } else if (successes == trigger.Conditions.length) {
+                    this.audioPlayer.play(trigger.Alert)
                     // TODO: Alerts.
                     this.#triggerHolds[t] = true
                     break
