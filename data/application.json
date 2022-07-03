@@ -392,6 +392,6 @@
     {"name": "progress", "icon": "check"},
     {"name": "calendar", "icon": "date_range"},
     {"name": "settings", "icon": "settings"},
-    {"name": "preview", "icon": "camera"}
+    {"name": "camera", "icon": "camera"}
   ]
 }

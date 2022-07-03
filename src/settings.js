@@ -1,4 +1,4 @@
-var container = document.getElementById('settings').querySelector('.card-primary').querySelector('.sub-container');
+var container = document.getElementById('settings').querySelector('.sub-container');
 var goalGroup;
 var parameterGroup;
 

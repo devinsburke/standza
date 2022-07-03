@@ -1,14 +1,13 @@
 class CameraProcessor {
-    constructor(cameraMode, elementContainer, estimatePoseFn, snapCameraImageFn) {
+    constructor(cameraMode, container, estimatePoseFn, snapCameraImageFn) {
 		this.snapCameraImage = snapCameraImageFn
 		this.estimatePose = estimatePoseFn
 		this.cameraMode = cameraMode || 'video'
-		this.elements = {
-			container: elementContainer,
-			image: elementContainer.getElementsByTagName('img')[0],
-			video: elementContainer.getElementsByTagName('video')[0],
-			canvas: elementContainer.getElementsByTagName('canvas')[0]
-		}
+		this.elements = jor(container, el => [
+			el('video').refer('video').attr('autoplay', 'true'),
+			el('img').refer('image'),
+			el('canvas').refer('canvas')
+		], {container})
 	}
 
 	async setupCamera() {

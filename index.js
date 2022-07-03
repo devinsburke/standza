@@ -24,7 +24,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 	const camera = new CameraProcessor(
 		'video',
-		document.getElementById('capture-wrapper'),
+		document.getElementById('camera'),
 		standzaAPI.estimatePose,
 		standzaAPI.snapCameraImage
 	)

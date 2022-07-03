@@ -11,7 +11,7 @@ class DrawerComponent {
                         for (const t of document.querySelectorAll('.selected-tab'))
                             t.classList.remove('selected-tab')
                         e.target.classList.add('selected-tab')
-                        container['data-tab'] = d.name
+                        container.setAttribute('data-tab', d.name)
                     })
                 )
             )

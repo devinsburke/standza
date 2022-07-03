@@ -11,28 +11,13 @@
         <div id="content-container">
             <div id="home" class="viz-container"></div>
             <div id="progress"></div>
-            <div id="calendar">
-                <h1>Schedule</h1>
-                <div class="card-primary">
-                    <ol class="select-list" id="schedule-list"></ol>
-                </div>
+            <div id="calendar" data-title="Schedule">
+                <ol class="select-list" id="schedule-list"></ol>
             </div>
-            <div id="settings">
-                <h1>Settings</h1>
-                <div class="card-primary">
-                    <div class="sub-container"></div>
-                </div>
+            <div id="settings" class="scrollable" data-title="Settings">
+                <div class="sub-container"></div>
             </div>
-            <div id="preview">
-                <h1>Camera Preview</h1>
-                <div class="card-primary">
-                    <div id="capture-wrapper">
-			            <video id="video-capture" autoplay="true"></video>
-			            <canvas id="canvas-capture"></canvas>
-                        <img id="img-capture" />
-                    </div>
-                </div>
-            </div>
+            <div id="camera" data-title="Camera Preview"></div>
         </div>
         <div id="audio-container"></div>
         <script src="https://d3js.org/d3.v7.min.js"></script>
