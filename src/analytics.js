@@ -1,13 +1,3 @@
-const vizRenderClass = 'rendered'
-const vizError = 'hsl(0deg 91% 63%)'
-const vizPalette = [
-	'var(--accent-dark)',
-	'transparent',
-	'hsl(216deg 63% 85%)', 
-	'hsl(216deg 83% 47%)',
-	'hsl(216deg 7% 46%)'
-]
-
 const formatters = {
 	toHM: (ms) => new Date(ms).toISOString().substring(11, 16),
 	toHMS: (ms) => new Date(ms).toISOString().substring(11, 19),
@@ -39,15 +29,13 @@ class Donut
 		this.Unit = unit
 		this.ValueKeys = valueKeys
 		this.elements = jor(container, el => [
-			el('donut').children(
-				el('svg').attr('viewBox', '0 0 1 0.5').children(
-					el('text').class('actual').refer('actual'),
-					el('text').class('unit').refer('unit'),
-					el('text').class('target-label').text('of'),
-					el('text').class('target').refer('target'),
-					el('circle'),
-					el('circle')
-				)
+			el('svg').attr('viewBox', '0 0 1 0.5').children(
+				el('text').class('actual').refer('actual'),
+				el('text').class('unit').refer('unit'),
+				el('text').class('target-label').text('of'),
+				el('text').class('target').refer('target'),
+				el('circle'),
+				el('circle')
 			)
 		], {container})
 	}

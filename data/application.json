@@ -369,7 +369,7 @@
       },
       {
         "Type": "Donut",
-        "Params": ["Working", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
+        "Params": ["Present", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
       }
     ],
 
