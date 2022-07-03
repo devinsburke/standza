@@ -347,46 +347,27 @@
     }
   },
   "Visualizations": {
-    "ban-container": [
-      {
-        "Type": "BAN",
-        "Params": {
-          "name": "Standing",
-          "valueKey": "states.standing.total",
-          "formatter": "toHM"
-        }
-      },
-      {
-        "Type": "BAN",
-        "Params": {
-          "name": "Working",
-          "valueKey": "states.notAbsent.total",
-          "formatter": "toHM"
-        }
-      },
-      {
-        "Type": "BAN",
-        "Params": {
-          "name": "Remaining Today",
-          "valueKey": "schedule.day.balance",
-          "formatter": "toHM"
-        }
-      }
-    ],
     "graph-container": [
       {
         "Type": "Donut",
-        "Params": ["Stand Progress", "Hours", ["states.standing.total", "parameters.standDayMinimum.timespan"]]
+        "Params": ["Standing", "Hours", ["states.standing.total", "parameters.standDayMinimum.timespan"]]
       },
       {
         "Type": "Donut",
-        "Params": ["Work Progress", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
-      },
-      {
-        "Type": "Bar",
-        "Params": ["Breaks Taken", "activity", "parameters.absentNowDuration"]
+        "Params": ["Working", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
       }
     ],
+
+    "events-container": [
+      {
+        "Type": "Gantt",
+        "Params": {
+          "tasks": ["Sitting", "Absent", "Standing"],
+          "dataKey": "activity"
+        }
+      }
+    ],
+    
 		"timeline-container": [
       {
         "Type": "State",
@@ -405,5 +386,12 @@
         }
       }
     ]
-  }
+  },
+  "tabs": [
+    {"name": "home", "icon": "home"},
+    {"name": "progress", "icon": "check"},
+    {"name": "calendar", "icon": "date_range"},
+    {"name": "settings", "icon": "settings"},
+    {"name": "preview", "icon": "camera"}
+  ]
 }

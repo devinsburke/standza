@@ -7,10 +7,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 	AppConfig = await AppConfiguration.fromJson('./data/application.json', standzaAPI.writeFile)
 	UserConfig = await UserConfiguration.fromJson('./data/user.json', standzaAPI.writeFile)
 	
-	const drawerComponent = new DrawerComponent(
-		document.getElementById('drawer'),
-		document.getElementById('content-container')
-	)
+	const drawerComponent = new DrawerComponent(document.body, AppConfig.tabs)
 	
 	const scheduleComponent = new ScheduleComponent(
 		document.getElementById('schedule-list'),
@@ -34,7 +31,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 	await camera.setupCamera()
 
 	const vizManager = new VisualizationManager(
-		document.getElementById('visualization-container'),
+		document.getElementById('home'),
 		AppConfig.Visualizations
 	)
 	const rules = new RuleEngine(
@@ -51,6 +48,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		() => UserConfig.refreshRate,
 		() => UserConfig.stateChangeTolerance
 	)
+	stateManager.log(getNow(), await camera.getCurrentPersonState())
 	stateManager.hooks.push(s => rules.run(s))
 	stateManager.hooks.push(s => vizManager.setData(s))
 	await stateManager.run()

@@ -15,26 +15,6 @@
 	--card-foreground: #F4EBCE;
 }
 
-/* :root {
-	--background-light: #fff;
-	--background-dark: #f3efe3;
-	
-	--primary-light: hsl(216deg 41% 35%);
-	--primary-dark: hsl(329deg 20% 24%);
-	
-	--font-light: #7fe1f4;
-	--font-dark: #1e58e6;
-	
-	--accent-light: #d9ffb3;
-	--accent-dark: #ffb5e3;
-	
-	--card-background: #d9ffb3;
-	--card-foreground: #d9ffb3;
-	
-	--error: hsl(0deg 91% 63%);
-	--success: hsl(144deg 29% 48%);
-} */
-
 * {
 	box-sizing: border-box;
 	user-select: none;
@@ -61,7 +41,7 @@ button {
 	cursor: pointer;
 }
 
-#drawer {
+drawer {
 	background: var(--background-dark);
 	display: grid;
 	grid-gap: 0.5em;
@@ -71,21 +51,21 @@ button {
 	z-index: 100;
 }
 
-	#drawer > button {
+	drawer button {
 		background: none;
 		padding: 0.5em;
 		transition: all .5s ease;
 	}		
-		#drawer > button:hover,
-		#drawer > button:active {
+		drawer button:hover,
+		drawer button:active {
 			background: var(--accent-light);
 		}
 		
-	#drawer > button.selected-tab {
+	drawer button.selected-tab {
 		background: var(--accent-dark);
 	}
-		#drawer > button.selected-tab:hover,
-		#drawer > button.selected-tab:active {
+		drawer button.selected-tab:hover,
+		drawer button.selected-tab:active {
 			background: white;
 			color: black;
 		}
@@ -109,25 +89,25 @@ button {
 	#content-container > div {
 		height: 100%;
 		width: 100%;
-		padding: 0.5em 1em;
+		padding: 1em;
 	}
 		#content-container > div > h1 {
 			margin-bottom: 10px;
 		}
 	
-	#content-container.home {
+	[data-tab=home] #content-container {
 		margin-top: 0;
 	}
-	#content-container.progress {
+	[data-tab=progress] #content-container {
 		margin-top: -100vh;
 	}
-	#content-container.calendar {
+	[data-tab=calendar] #content-container {
 		margin-top: -200vh;
 	}
-	#content-container.settings {
+	[data-tab=settings] #content-container {
 		margin-top: -300vh;
 	}
-	#content-container.preview {
+	[data-tab=preview] #content-container {
 		margin-top: -400vh;
 	}
 

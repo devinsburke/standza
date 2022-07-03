@@ -1,24 +1,20 @@
-const drawers = [
-    {name: 'home', icon: 'home'},
-    {name: 'progress', icon: 'check'},
-    {name: 'calendar', icon: 'date_range'},
-    {name: 'settings', icon: 'settings'},
-    {name: 'preview', icon: 'camera'},
-]
-
 class DrawerComponent {
-    constructor(container, contentContainer) {
-        jor(container, el => drawers.map(d =>
-            el('button')
-            .text(d.icon)
-            .class('material-icons')
-            .class('selected-tab', d.name == 'home')
-            .set('onclick', e => {
-                for (const t of document.querySelectorAll('.selected-tab'))
-                    t.classList.remove('selected-tab')
-                e.target.classList.add('selected-tab')
-                contentContainer.className = d.name
-            })
-        ))
+    constructor(container, tabs) {
+        jor(container, el => [
+            el('drawer').children(
+                ...tabs.map(d =>
+                    el('button')
+                    .text(d.icon)
+                    .class('material-icons')
+                    .class('selected-tab', d.name == tabs[0].name)
+                    .set('onclick', e => {
+                        for (const t of document.querySelectorAll('.selected-tab'))
+                            t.classList.remove('selected-tab')
+                        e.target.classList.add('selected-tab')
+                        container['data-tab'] = d.name
+                    })
+                )
+            )
+        ])
     }
 }
