@@ -25,52 +25,9 @@ class Schedule {
 	}
 }
 
-class Condition {
-    #operators = {
-        "equal": (a, b) => a == b,
-        "notEqual": (a, b) => a != b,
-        "greaterThanOrEqual": (a, b) => a >= b,
-        "lessThanOrEqual": (a, b) => a <= b
-    }
-
-	constructor({Arguments, Operator, Comparison}) { 
-		this.Arguments = Arguments
-		this.Operator = Operator
-		this.Comparison = Comparison
-	}
-
-	evaluate(summary) {
-		const op = this.#operators[this.Operator]
-		return op(summary.seek(this.Arguments), summary.seek(this.Comparison))
-	}
-}
-
-class Trigger {
-	constructor({Alert, Conditions}) {
-		this.Alert = Alert
-		this.Conditions = Conditions ? Conditions.map(c => new Condition(c)) : []
-	}
-}
-
-class Goal {
-	constructor({Label, Description, Sort, Triggers}) { 
-		this.Label = Label
-		this.Description = Description
-		this.Sort = Sort
-		this.Triggers = Triggers || []
-	}
-}
-
-class Parameter {
-	constructor({Label, DefaultValue, DefaultInterval}) { 
-		this.Label = Label
-		this.DefaultValue = DefaultValue
-		this.DefaultInterval = DefaultInterval
-	}
-}
-
 class AppConfiguration {
-	constructor({Visualizations, Parameters, Triggers, Goals}) {
+	constructor({tabs, Visualizations, Parameters, Triggers, Goals}) {
+		this.tabs = tabs || []
 		this.Visualizations = Visualizations || []
 		this.Parameters = {}
 		this.Triggers = {}
