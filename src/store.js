@@ -26,15 +26,15 @@ class Schedule {
 }
 
 class AppConfiguration {
-	constructor({tabs, Visualizations, Parameters, Triggers, Goals}) {
+	constructor({tabs, visualizations, parameters, triggers, goals}) {
 		this.tabs = tabs || []
-		this.Visualizations = Visualizations || []
-		this.Parameters = {}
-		this.Triggers = {}
-		this.Goals = {}
-		for (const k in Parameters) this.Parameters[k] = new Parameter(Parameters[k])
-		for (const k in Triggers) this.Triggers[k] = new Trigger(Triggers[k])
-		for (const k in Goals) this.Goals[k] = new Goal(Goals[k])
+		this.visualizations = visualizations || []
+		this.parameters = {}
+		this.triggers = {}
+		this.goals = {}
+		for (const k in parameters) this.parameters[k] = new Parameter(parameters[k])
+		for (const k in triggers) this.triggers[k] = new Trigger(triggers[k])
+		for (const k in goals) this.goals[k] = new Goal(goals[k])
 	}
 
 	static async fromJson(jsonPath) {

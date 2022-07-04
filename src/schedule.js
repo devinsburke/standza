@@ -28,7 +28,7 @@ class ScheduleComponent {
 				if (e.target == e.currentTarget) {
 					d.Enabled = !d.Enabled
 					e.target.classList.toggle('selected', d.Enabled)
-					UserConfig.save() // TODO: Await
+					userConfig.save() // TODO: Await
 				}
 			})
 			.children(
@@ -50,7 +50,7 @@ class ScheduleComponent {
 
 		day[dayAttribute] = newTime
 		btn.textContent = newTime
-		UserConfig.save()
+		userConfig.save()
 	}
 }
 

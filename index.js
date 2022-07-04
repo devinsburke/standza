@@ -1,20 +1,20 @@
-let AppConfig = null
-let UserConfig = null
+let appConfig = null
+let userConfig = null
 
 const getNow = () => new Date(Date.now())
 
 window.addEventListener('DOMContentLoaded', async () => {
-	AppConfig = await AppConfiguration.fromJson('./data/application.json', standzaAPI.writeFile)
-	UserConfig = await UserConfiguration.fromJson('./data/user.json', standzaAPI.writeFile)
+	appConfig = await AppConfiguration.fromJson('./data/application.json', standzaAPI.writeFile)
+	userConfig = await UserConfiguration.fromJson('./data/user.json', standzaAPI.writeFile)
 	
 	document.body.classList.add('loading')
 	
 	setupSettings()
 
-	const drawer = new DrawerComponent(document.body, AppConfig.tabs)
+	const drawer = new DrawerComponent(document.body, appConfig.tabs)
 	const schedule = new ScheduleComponent(
 		document.getElementById('schedule-list'),
-		UserConfig.schedule
+		userConfig.schedule
 	)
 	const audio = new AudioComponent(document.body)
 
@@ -28,21 +28,21 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 	const vizManager = new VisualizationManager(
 		document.getElementById('home'),
-		AppConfig.Visualizations
+		appConfig.visualizations
 	)
 	const rules = new RuleEngine(
-		UserConfig.goals,
-		AppConfig.Goals,
-		AppConfig.Triggers,
+		userConfig.goals,
+		appConfig.goals,
+		appConfig.triggers,
 		audio
 	)
 
 	const stateManager = new StateManager(
 		camera,
-		UserConfig.schedule,
-		UserConfig.parameters,
-		() => UserConfig.refreshRate,
-		() => UserConfig.stateChangeTolerance
+		userConfig.schedule,
+		userConfig.parameters,
+		() => userConfig.refreshRate,
+		() => userConfig.stateChangeTolerance
 	)
 	stateManager.log(getNow(), await camera.getCurrentPersonState())
 	stateManager.hooks.push(s => rules.run(s))

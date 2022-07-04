@@ -1,39 +1,39 @@
 {
-  "Parameters": {
+  "parameters": {
     "workDayMinimum": {
-      "Label": "Required work time per day",
-      "DefaultValue": "8",
-      "DefaultInterval": "Hour"
+      "label": "Required work time per day",
+      "defaultValue": "8",
+      "defaultInterval": "Hour"
     },
     "awayFrequency": {
-      "Label": "Desired break frequency",
-      "DefaultValue": "2",
-      "DefaultInterval": "Hour"
+      "label": "Desired break frequency",
+      "defaultValue": "2",
+      "defaultInterval": "Hour"
     },
     "awayNowMaximum": {
-      "Label": "Desired break length",
-      "DefaultValue": "15",
-      "DefaultInterval": "Minute"
+      "label": "Desired break length",
+      "defaultValue": "15",
+      "defaultInterval": "Minute"
     },
     "standDayMinimum": {
-      "Label": "Desired time standing per day",
-      "DefaultValue": "8",
-      "DefaultInterval": "Hour"
+      "label": "Desired time standing per day",
+      "defaultValue": "8",
+      "defaultInterval": "Hour"
     },
     "standFrequency": {
-      "Label": "Desired standing frequency",
-      "DefaultValue": "2",
-      "DefaultInterval": "Hour"
+      "label": "Desired standing frequency",
+      "defaultValue": "2",
+      "defaultInterval": "Hour"
     },
     "standNowMaximum": {
-      "Label": "Desired standing duration",
-      "DefaultValue": "2",
-      "DefaultInterval": "Hour"
+      "label": "Desired standing duration",
+      "defaultValue": "2",
+      "defaultInterval": "Hour"
     }
   },
-  "Triggers": {
+  "triggers": {
     "worked-day-minimum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -50,11 +50,11 @@
           "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/worked-day-minimum.mp3"],
-      "AlertText": "Congratulations! You have finished your work day."
+      "alert": ["./audio/.chime.mp3", "./audio/worked-day-minimum.mp3"],
+      "alertText": "Congratulations! You have finished your work day."
     },
     "stood-day-minimum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -71,11 +71,11 @@
           "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/stood-day-minimum.mp3"],
-      "AlertText": "Congratulations! You stood for {} today. You may now sit down."
+      "alert": ["./audio/.chime.mp3", "./audio/stood-day-minimum.mp3"],
+      "alertText": "Congratulations! You stood for {} today. You may now sit down."
     },
     "cannot-work-day-minimum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -87,11 +87,11 @@
           "Comparison": "parameters.workDayMinimum.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/cannot-work-day-minimum.mp3"],
-      "AlertText": "Attention. You will not finish working on time unless you stay at your desk for the rest of the day."
+      "alert": ["./audio/.chime.mp3", "./audio/cannot-work-day-minimum.mp3"],
+      "alertText": "Attention. You will not finish working on time unless you stay at your desk for the rest of the day."
     },
     "failed-work-day-minimum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -108,11 +108,11 @@
           "Comparison": 0
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/failed-work-day-minimum.mp3"],
-      "AlertText": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when your have met your set hours."
+      "alert": ["./audio/.chime.mp3", "./audio/failed-work-day-minimum.mp3"],
+      "alertText": "Attention. It is now after hours but you have not worked a full day. If you continue working, you will be notified when your have met your set hours."
     },
     "failed-stand-day-minimum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -134,11 +134,11 @@
           "Comparison": 0
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/failed-stand-day-minimum.mp3"],
-      "AlertText": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration."
+      "alert": ["./audio/.chime.mp3", "./audio/failed-stand-day-minimum.mp3"],
+      "alertText": "Attention. It is now after hours but you have not stood for your desired hours. If you continue standing while working, you will be notified when you have stood the full duration."
     },
     "end-day-clock": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -155,11 +155,11 @@
           "Comparison": 0
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/end-day-clock.mp3"],
-      "AlertText": "Congratulations, it is now after hours. That means your work day is over."
+      "alert": ["./audio/.chime.mp3", "./audio/end-day-clock.mp3"],
+      "alertText": "Congratulations, it is now after hours. That means your work day is over."
     },
     "stand-now-timer": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -191,11 +191,11 @@
           "Comparison": "parameters.standFrequency.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/stand-now-timer.mp3"],
-      "AlertText": "It's time to stand!"
+      "alert": ["./audio/.chime.mp3", "./audio/stand-now-timer.mp3"],
+      "alertText": "It's time to stand!"
     },
     "stand-now-maximum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -227,11 +227,11 @@
           "Comparison": "parameters.standNowDuration.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/stand-now-maximum.mp3"],
-      "AlertText": "You may now sit down."
+      "alert": ["./audio/.chime.mp3", "./audio/stand-now-maximum.mp3"],
+      "alertText": "You may now sit down."
     },
     "cannot-stand-day-minimum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -248,11 +248,11 @@
           "Comparison": "parameters.standDayMinimum.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/cannot-stand-day-minimum.mp3"],
-      "AlertText": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day."
+      "alert": ["./audio/.chime.mp3", "./audio/cannot-stand-day-minimum.mp3"],
+      "alertText": "Attention. You will not reach your goal of standing during work hours unless you stand the rest of the day."
     },
     "away-now-timer": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -284,11 +284,11 @@
           "Comparison": "parameters.awayFrequency.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/away-now-timer.mp3"],
-      "AlertText": "It's time to take a break!"
+      "alert": ["./audio/.chime.mp3", "./audio/away-now-timer.mp3"],
+      "alertText": "It's time to take a break!"
     },
     "away-now-maximum": {
-      "Conditions": [
+      "conditions": [
         {
           "Arguments": "schedule.day.enabled",
           "Operator": "equal",
@@ -315,68 +315,68 @@
           "Comparison": "parameters.absentNowDuration.timespan"
         }
       ],
-      "Alert": ["./audio/.chime.mp3", "./audio/away-now-maximum.mp3"],
-      "AlertText": "Attention. You should now return to your desk."
+      "alert": ["./audio/.chime.mp3", "./audio/away-now-maximum.mp3"],
+      "alertText": "Attention. You should now return to your desk."
     }
   },
-  "Goals": {
+  "goals": {
     "work-day-minimum": {
-      "Label": "Ensure I work a full day",
-      "Description": "Lets you take breaks at your leisure, but warns you when you must work continuously to finish work during scheduled hours. Alerts you when the goal is met, and updates you at the end of scheduled hours.",
-      "Sort": 10,
-      "Triggers": ["worked-day-minimum", "cannot-work-day-minimum", "failed-work-day-minimum"]
+      "label": "Ensure I work a full day",
+      "description": "Lets you take breaks at your leisure, but warns you when you must work continuously to finish work during scheduled hours. Alerts you when the goal is met, and updates you at the end of scheduled hours.",
+      "sort": 10,
+      "triggers": ["worked-day-minimum", "cannot-work-day-minimum", "failed-work-day-minimum"]
     },
     "work-day-clock": {
-      "Label": "Stop working the earliest I can",
-      "Description": "Alerts you when the scheduled day ends or you've worked your required number of hours, whichever is first.",
-      "Sort": 20,
-      "Triggers": ["worked-day-minimum", "end-day-clock"]
+      "label": "Stop working the earliest I can",
+      "description": "Alerts you when the scheduled day ends or you've worked your required number of hours, whichever is first.",
+      "sort": 20,
+      "triggers": ["worked-day-minimum", "end-day-clock"]
     },
     "stand-day-minimum": {
-      "Label": "Stand a minimum amount each day",
-      "Description": "Lets you stand at your leisure, but warns you when you must stand for the remainder of scheduled hours to meet your goal. Alerts you when the goal is met, and updates you at the end of scheduled hours.",
-      "Sort": 30,
-      "Triggers": ["stood-day-minimum", "cannot-stand-day-minimum", "failed-stand-day-minimum"]
+      "label": "Stand a minimum amount each day",
+      "description": "Lets you stand at your leisure, but warns you when you must stand for the remainder of scheduled hours to meet your goal. Alerts you when the goal is met, and updates you at the end of scheduled hours.",
+      "sort": 30,
+      "triggers": ["stood-day-minimum", "cannot-stand-day-minimum", "failed-stand-day-minimum"]
     },
     "stand-regularly": {
-      "Label": "Regularly switch to standing",
-      "Description": "Instructs you to stand when you've gone so long without standing. Then notifies you when you may resume sitting.",
-      "Sort": 40,
-      "Triggers": ["stand-now-timer", "stand-now-maximum"]
+      "label": "Regularly switch to standing",
+      "description": "Instructs you to stand when you've gone so long without standing. Then notifies you when you may resume sitting.",
+      "sort": 40,
+      "triggers": ["stand-now-timer", "stand-now-maximum"]
     },
     "break-regularly": {
-      "Label": "Regularly take a break and walk away",
-      "Description": "Instructs you to take a break after working continuously for so long. Then notifies you when it's time to return.",
-      "Sort": 50,
-      "Triggers": ["away-now-maximum", "cannot-work-day-minimum", "away-now-timer"]
+      "label": "Regularly take a break and walk away",
+      "description": "Instructs you to take a break after working continuously for so long. Then notifies you when it's time to return.",
+      "sort": 50,
+      "triggers": ["away-now-maximum", "cannot-work-day-minimum", "away-now-timer"]
     },
     "break-now-maximum": {
-      "Label": "Ensure I am never away too long",
-      "Description": "Alerts you any time you have been away from your desk longer than desired.",
-      "Sort": 60,
-      "Triggers": ["away-now-maximum", "cannot-work-day-minimum"]
+      "label": "Ensure I am never away too long",
+      "description": "Alerts you any time you have been away from your desk longer than desired.",
+      "sort": 60,
+      "triggers": ["away-now-maximum", "cannot-work-day-minimum"]
     }
   },
-  "Visualizations": {
+  "visualizations": {
     "graph-container": [
       {
-        "Type": "Donut",
-        "Params": ["Standing", "Hours", ["states.standing.total", "parameters.standDayMinimum.timespan"]]
+        "type": "Donut",
+        "params": ["Standing", "Hours", ["states.standing.total", "parameters.standDayMinimum.timespan"]]
       },
       {
-        "Type": "Donut",
-        "Params": ["Working", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
+        "type": "Donut",
+        "params": ["Working", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
       },
       {
-        "Type": "Donut",
-        "Params": ["Present", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
+        "type": "Donut",
+        "params": ["Present", "Hours", ["states.notAbsent.total", "parameters.workDayMinimum.timespan"]]
       }
     ],
 
     "events-container": [
       {
-        "Type": "Gantt",
-        "Params": {
+        "type": "Gantt",
+        "params": {
           "tasks": ["Sitting", "Absent", "Standing"],
           "dataKey": "activity"
         }
@@ -385,8 +385,8 @@
     
 		"timeline-container": [
       {
-        "Type": "State",
-        "Params": {
+        "type": "State",
+        "params": {
           "valueKey": "state.assumed",
           "compareToKey": "state.raw",
           "subtitleKey": "state.duration",
@@ -394,8 +394,8 @@
         }
       },
       {
-        "Type": "Clock",
-        "Params": {
+        "type": "Clock",
+        "params": {
           "valueKey": "timestamp",
           "formatter": "toLocalHMTT"
         }

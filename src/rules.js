@@ -19,27 +19,27 @@ class Condition {
 }
 
 class Trigger {
-	constructor({Alert, AlertText, Conditions}) {
-		this.Alert = Alert
-        this.AlertText = AlertText
-		this.Conditions = Conditions ? Conditions.map(c => new Condition(c)) : []
+	constructor({alert, alertText, conditions}) {
+		this.alert = alert
+        this.alertText = alertText
+		this.conditions = conditions ? conditions.map(c => new Condition(c)) : []
 	}
 }
 
 class Goal {
-	constructor({Label, Description, Sort, Triggers}) { 
-		this.Label = Label
-		this.Description = Description
-		this.Sort = Sort
-		this.Triggers = Triggers || []
+	constructor({label, description, sort, triggers}) { 
+		this.label = label
+		this.description = description
+		this.sort = sort
+		this.triggers = triggers || []
 	}
 }
 
 class Parameter {
-	constructor({Label, DefaultValue, DefaultInterval}) { 
-		this.Label = Label
-		this.DefaultValue = DefaultValue
-		this.DefaultInterval = DefaultInterval
+	constructor({label, defaultValue, defaultInterval}) { 
+		this.label = label
+		this.defaultValue = defaultValue
+		this.defaultInterval = defaultInterval
 	}
 }
 
@@ -55,16 +55,16 @@ class RuleEngine {
 
     run(summary) {
         for (const g of this.goals) {
-            for (const t of this.goalDefinitions[g].Triggers) {
+            for (const t of this.goalDefinitions[g].triggers) {
                 const trigger = this.triggerDefinitions[t]
-                const successes = trigger.Conditions.reduce((i, c) => i + c.evaluate(summary), 0)
+                const successes = trigger.conditions.reduce((i, c) => i + c.evaluate(summary), 0)
 
                 if (t in this.#triggerHolds) {
                     if (successes)
                         break
                     delete this.#triggerHolds[t]
-                } else if (successes == trigger.Conditions.length) {
-                    this.audioComponent.play(trigger.Alert)
+                } else if (successes == trigger.conditions.length) {
+                    this.audioComponent.play(trigger.alert)
                     // TODO: Alerts.
                     this.#triggerHolds[t] = true
                     break

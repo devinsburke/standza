@@ -150,9 +150,9 @@ class VisualizationManager
 
 			for (const v of vizConfig[group]) {
 				const el = document.createElement('viz')
-				el.classList.add(v.Type.toLowerCase())
+				el.classList.add(v.type.toLowerCase())
 				div.appendChild(el)
-				this.visualizations.push(new this.#vizClasses[v.Type](el, v.Params))
+				this.visualizations.push(new this.#vizClasses[v.type](el, v.params))
 			}
 		}
 	}

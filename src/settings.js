@@ -21,9 +21,9 @@ class Setting
 	{
 		this.Id = id
 		this.Name = name
-		this.Description = description
+		this.description = description
 		this.Value = value
-		this.Type = type
+		this.type = type
 		this.Category = category
 	}
 	
@@ -33,7 +33,7 @@ class Setting
 		var name = document.createElement('setting-name');
 		name.textContent = this.Name;
 		var description = document.createElement('span');
-		description.textContent = this.Description;
+		description.textContent = this.description;
 		if (this.Value)
 			setting.classList.add('enabled');
 		setting.appendChild(name);
@@ -47,7 +47,7 @@ class Setting
 			else 
 				this.classList.remove('enabled');
 			element.Value = !element.Value;
-			UserConfig.changeGoal(element.Id, element.Value);
+			userConfig.changeGoal(element.Id, element.Value);
 		};
 		setting.id = this.Id;
 		this.#element = setting;
@@ -92,7 +92,7 @@ class Setting
 				element.Value.Value = String(parseInt(element.Value.Value) - 5);
 			var valueElement = document.getElementById(element.Id + '-value');
 			valueElement.textContent = element.Value.Value;
-			UserConfig.changeParameter(element.Id, element.Value);
+			userConfig.changeParameter(element.Id, element.Value);
 		}
 		
 		up.onclick = function(e) {
@@ -106,7 +106,7 @@ class Setting
 				element.Value.Value = String(parseInt(element.Value.Value) + 5);
 			var valueElement = document.getElementById(element.Id + '-value');
 			valueElement.textContent = element.Value.Value;
-			UserConfig.changeParameter(element.Id, element.Value);
+			userConfig.changeParameter(element.Id, element.Value);
 		}
 		
 		interval.onclick = function(e) {
@@ -119,7 +119,7 @@ class Setting
 			else 
 				element.Value.Interval = 'Hour';
 			this.textContent = element.Value.Interval + '(s)';
-			UserConfig.changeParameter(element.Id, element.Value);
+			userConfig.changeParameter(element.Id, element.Value);
 		};
 		
 		valueContainer.appendChild(down);
@@ -134,7 +134,7 @@ class Setting
 	}
 	
 	generate(container) {
-		switch (this.Type) {
+		switch (this.type) {
 			case ToggleType:
 				this.#generateToggle(container);
 				break;
@@ -167,21 +167,21 @@ class SettingGroup
 }
 
 setupSettings = function() {
-	goalGroup = new SettingGroup('Goals');
-	goalGroup.Settings = Object.entries(AppConfig.Goals).sort(g => g.Sort).map(g => {
-		return new Setting(g[0], g[1].Label, g[1].Description, UserConfig.goals.find(u => u == g[0]) != null, GoalCategory, ToggleType);
+	goalGroup = new SettingGroup('goals');
+	goalGroup.Settings = Object.entries(appConfig.goals).sort(g => g.sort).map(g => {
+		return new Setting(g[0], g[1].label, g[1].description, userConfig.goals.find(u => u == g[0]) != null, GoalCategory, ToggleType);
 	});
 	goalGroup.generate();
 	
-	parameterGroup = new SettingGroup('Parameters');
-	parameterGroup.Settings = Object.entries(AppConfig.Parameters).sort(p => p[0]).map(p => {
+	parameterGroup = new SettingGroup('parameters');
+	parameterGroup.Settings = Object.entries(appConfig.parameters).sort(p => p[0]).map(p => {
 		return new Setting(
 			p[0], 
-			p[1].Label, 
-			p[1].Description, 
+			p[1].label, 
+			p[1].description, 
 			{
-				Value: UserConfig.parameters[p[0]] != null ? UserConfig.parameters[p[0]].Value : p[1].DefaultValue,
-				Interval: UserConfig.parameters[p[0]] != null ? UserConfig.parameters[p[0]].Interval : p[1].DefaultInterval
+				Value: userConfig.parameters[p[0]] != null ? userConfig.parameters[p[0]].Value : p[1].defaultValue,
+				Interval: userConfig.parameters[p[0]] != null ? userConfig.parameters[p[0]].Interval : p[1].defaultInterval
 			}, 
 			ParameterCategory, 
 			TimeSpanType

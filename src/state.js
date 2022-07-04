@@ -11,10 +11,10 @@ class StateManager {
     #log = []
     #currentState = null
 
-    constructor(camera, schedule, goalParameters, refreshRateFn, stateChangeToleranceFn) {
+    constructor(camera, schedule, parameters, refreshRateFn, stateChangeToleranceFn) {
         this.camera = camera
         this.schedule = schedule
-        this.goalParameters = goalParameters
+        this.parameters = parameters
         this.getRefreshRate = refreshRateFn
         this.getStateChangeTolerance = stateChangeToleranceFn
         this.hooks = []
@@ -42,7 +42,7 @@ class StateManager {
         this.#currentState ??= rawState
         this.log(getNow(), rawState)
 
-        const summary = new Summary(this.goalParameters, this.#log)
+        const summary = new Summary(this.parameters, this.#log)
         this.hooks.forEach(fn => fn(summary))
         setTimeout((async() => await this.run()), this.getRefreshRate())
     }
