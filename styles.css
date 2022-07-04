@@ -5,8 +5,13 @@
 	--accent-light: #e3b154;
 	--accent-dark: #C5877A;
 
+	--viz-success: #7ac58f;
+	--viz-process: #C5877A;
+	--viz-neutral: #e3b154;
+
 	--background-light: #F4EBCE;
 	--background-dark: #657EAF;
+	--background-dark-accent: #657EAF99;
 	
 	--font-light: #F4EBCE;
 	--font-dark: #657EAF;
@@ -17,6 +22,7 @@
 
 * {
 	box-sizing: border-box;
+	font-family: 'Noto sans';
 	user-select: none;
 }
 
@@ -25,7 +31,6 @@ html, body {
 	color: var(--font-dark);
 	display: flex;
 	flex-direction: row-reverse;
-	font-family: 'Noto sans';
 	overflow: hidden;
 	margin: 0;
 }

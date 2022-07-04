@@ -1,37 +1,31 @@
 .viz-container {
-	width: 100%;
-	height: 100%;
 	display: flex;
-	gap: 0.5em;
 	flex-direction: column;
+	height: 100%;
+	padding: 0 !important;
+	width: 100%;
 }
 	.viz-container > * {
 		align-items: center;
 		display: flex;
 		gap: 2em;
+		padding: 1em;
 	}
 
-	.events-container {
+	.viz-container .events-container {
 		flex-grow: 1;
 	}
-
-/* .ban-container {
-	height: 16.5%;
-}
-.graph-container {
-	height: 66%;
-}
-.timeline-container {
-	height: 16.5%;
-} */
+	.viz-container .timeline-container {
+		background: var(--background-dark-accent);
+		color: var(--font-light);
+	}
 
 viz {
-	xborder-radius: 0.8em;
-	xbox-shadow: 0 0 0.1em 0 #0000004d;
 	display: flex;
 	flex: 1 1 0;
 	flex-flow: column;
-	xpadding: 0.5em;
+	gap: 0.5em;
+	white-space: pre;
 }
 	viz.ban {
 		align-items: center;
@@ -54,30 +48,26 @@ viz {
 	
 	viz.donut::before {
 		content: var(--data-name, ' ');
-		white-space: pre;
-		margin-bottom: 0.5em;
 		text-align: center;
 	}
-
 	viz.donut svg circle {
 		clip-path: circle();
 		cx: 0.5;
 		cy: 0.5;
-		fill: none;
+		fill: none !important;
 		r: 0.5;
 		stroke: #00000010;
 		stroke-width: 15%;
 	}
 		viz.donut svg circle:last-child {
-			stroke: var(--accent-dark);
 			stroke-dasharray: calc(var(--data-current-int, 0) / var(--data-total-int, 1) * 3.14/2 + 3.14/2) 3.14;
 			stroke-width: 15%;
 			transform-origin: 50% 25%;
 			transform: rotate(0deg);
 		}
 	viz.donut text {
-		fill: var(--accent-dark);
 		font-size: 0.5%;
+		stroke-width: 0;
 	}
 		viz.donut text.actual {
 			font-size: 1%;
@@ -89,36 +79,44 @@ viz {
 			opacity: 0.5;
 			transform: translate(50%, 95%);
 		}
+	viz.donut[data-status=success] svg circle:last-child,
+	viz.donut[data-status=success] svg text {
+		fill: var(--viz-success);
+		stroke: var(--viz-success);
+	}
+	viz.donut[data-status=process] svg circle:last-child,
+	viz.donut[data-status=process] svg text {
+		fill: var(--viz-process);
+		stroke: var(--viz-process);
+	}
+	viz.donut[data-status=neutral] svg circle:last-child,
+	viz.donut[data-status=neutral] svg text {
+		fill: var(--viz-neutral);
+		stroke: var(--viz-neutral);
+	}
 
-	viz.state, viz.clock {
+	viz.state,
+	viz.clock {
 		align-items: center;
 		flex-flow: row;
-	}
-	viz.state.mismatch {
-		color: yellow;
-	}
-	viz.state::before {
-		content: attr(data-value);
-		flex-grow: 1;
+		flex-grow: 0;
 		font-size: 2em;
-		text-align: center;
+	}
+		viz.state::before,
+		viz.clock::before {
+			content: attr(data-value);
+		}
+	viz.state.mismatch {
+		color: var(--accent-light);
 	}
 	viz.state::after {
 		content: attr(data-subtitle);
-		flex-grow: 1;
-		font-size: 1em;
-		text-align: center;
-	}
-	viz.clock::before {
-		content: attr(data-time);
-		display: flex;
-		flex-grow: 1;
-	    font-size: 2em;
-		justify-content: space-around;
+		font-size: 0.8em;
+		opacity: 0.75;
 	}
 
-	viz.gantt line, viz.gantt path { opacity: 0.3 !important; }
-	viz.gantt .Absent { fill: #eee; rx: 1%; ry: 1%; }
-	viz.gantt .Sitting { fill: blue; rx: 1%; ry: 1%; }
-	viz.gantt .Standing { fill: red; rx: 1%; ry: 1%; }
-	viz.gantt svg {  }
+	viz.gantt line, viz.gantt path { opacity: 0.15 !important; }
+	viz.gantt .yaxis text { font-size: 1.3em; }
+	viz.gantt .absent { fill: transparent; rx: 1%; ry: 1%; }
+	viz.gantt .sitting { fill: var(--viz-neutral); rx: 1%; ry: 1%; }
+	viz.gantt .standing { fill: var(--viz-neutral); rx: 1%; ry: 1%; }

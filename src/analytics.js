@@ -43,6 +43,7 @@ class Donut
 	redraw(data) {
 		const [current, total] = this.ValueKeys.map(k => data[k])
 		const style = this.elements.container.style
+		this.elements.container.setAttribute('data-status', current >= total ? 'success' : 'process')
 		this.elements.actual.textContent = formatters.toHM(current)//.toFixed(2)
 		this.elements.target.textContent = 'target: ' + formatters.toHM(total)//.toFixed(2)
 		this.elements.unit.textContent = ''//this.Unit.toLowerCase()
@@ -76,7 +77,7 @@ class Gantt {
 		const svg = d3.select(this.elements.svg)
 		const activity = data[this.dataKey]
 		
-		const xMargin = 50
+		const xMargin = 60
 		const yMargin = 20
 		const width = 600
 		const height = 150
@@ -99,7 +100,7 @@ class Gantt {
 		svg.select('.data').selectAll('rect').data(activity).enter()
 			.append('rect')
 			.attr('transform', d => `translate(${this.xScale(d.start)},${this.yScale(d.state)})`)
-			.attr('class', d => d.state)
+			.attr('class', d => d.state.toLowerCase())
 			.attr('height', this.yScale.bandwidth())
 			.attr('width', d => this.xScale(d.end) - this.xScale(d.start))
 	}
@@ -132,13 +133,18 @@ class Clock
 	}
 	
 	redraw(data) {
-		this.Element.setAttribute('data-time', this.formatFn(data[this.valueKey]))
+		this.Element.setAttribute('data-value', this.formatFn(data[this.valueKey]))
 	}
+}
+
+class Spacer {
+	constructor() { }
+	redraw() { }
 }
 
 class VisualizationManager
 {
-	#vizClasses = {BAN, Donut, Gantt, State, Clock}
+	#vizClasses = {BAN, Donut, Gantt, State, Clock, Spacer}
 
 	constructor(container, vizConfig) 
 	{
