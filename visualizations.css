@@ -2,23 +2,39 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	opacity: 1;
 	padding: 0 !important;
+	transition: ease 1s;
+	visibility: visible;
 	width: 100%;
 }
 	.viz-container > * {
-		align-items: center;
 		display: flex;
 		gap: 2em;
-		padding: 1em;
+		padding: 0.6em;
+		position: relative;
 	}
 
+	.viz-container .graph-container {
+		max-height: 33%;
+	}
 	.viz-container .events-container {
+		align-items: flex-start;
 		flex-grow: 1;
 	}
 	.viz-container .timeline-container {
 		background: var(--background-dark-accent);
 		color: var(--font-light);
 	}
+
+	.loading .viz-container {
+		opacity: 0;
+		visibility: hidden;
+		transition: ease-in 3s;
+	}
+		.loading .viz-container svg {
+			display: none;
+		}
 
 viz {
 	display: flex;
@@ -115,8 +131,30 @@ viz {
 		opacity: 0.75;
 	}
 
-	viz.gantt line, viz.gantt path { opacity: 0.15 !important; }
-	viz.gantt .yaxis text { font-size: 1.3em; }
-	viz.gantt .absent { fill: transparent; rx: 1%; ry: 1%; }
-	viz.gantt .sitting { fill: var(--viz-neutral); rx: 1%; ry: 1%; }
-	viz.gantt .standing { fill: var(--viz-neutral); rx: 1%; ry: 1%; }
+	viz.gantt {
+		position: absolute;
+		bottom: 0.6em;
+		left: 0.6em;
+		right: 0.6em;
+		top: 0.6em;
+	}
+		viz.gantt svg {
+			height: 100%;
+			width: 100%;
+		}
+			viz.gantt svg line,
+			viz.gantt svg path {
+				opacity: 0.15 !important; 
+			}
+			viz.gantt svg g.yaxis text {
+				font-size: 1.3em; 
+			}
+			viz.gantt svg rect.absent { 
+				fill: transparent; rx: 1%; ry: 1%; 
+			}
+			viz.gantt svg rect.sitting { 
+				fill: var(--viz-neutral); rx: 1%; ry: 1%;
+			}
+			viz.gantt svg rect.standing {
+				fill: var(--viz-neutral); rx: 1%; ry: 1%; 
+			}

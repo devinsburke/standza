@@ -59,13 +59,14 @@ class Gantt {
 		this.dataKey = dataKey
 
 		this.elements = jor(container, el => [
-			el('svg').attr('viewBox', '0 0 600 150').refer('svg')
+			el('svg').refer('svg')
 		], {container})
 
 		this.xScale = d3.scaleTime()
-		this.yScale = d3.scaleBand().domain(['Standing','Absent','Sitting'])
-		this.xAxis = d3.axisBottom().scale(this.xScale).ticks(d3.timeHour)		
+		this.yScale = d3.scaleBand().domain(['Standing','Sitting'])
+		this.xAxis = d3.axisBottom().scale(this.xScale)
 		this.yAxis = d3.axisLeft().scale(this.yScale).tickSize(0)
+		this.margin = {left: 60, right: 15, top: 0, bottom: 20}
 
 		const svg = d3.select(this.elements.svg)
 		svg.append('g').attr('class', 'xaxis')
@@ -77,31 +78,32 @@ class Gantt {
 		const svg = d3.select(this.elements.svg)
 		const activity = data[this.dataKey]
 		
-		const xMargin = 60
-		const yMargin = 20
-		const width = 600
-		const height = 150
+		const xLabelWidth = 30 // Hard coded.
+		const width = this.elements.container.offsetWidth
+		const height = this.elements.container.offsetHeight
 
 		const startTime = Math.min(activity[0].start, data['schedule.day.start'])
 		const endTime = Math.max(activity[activity.length-1].end, data['schedule.day.end'])
 
 		this.xScale.domain([startTime, endTime + 1000 * 60 * 30])
-		this.xScale.range([xMargin, width])
+		this.xScale.range([this.margin.left, width - this.margin.right])
+		this.xAxis.ticks((width - this.margin.left - this.margin.right) / xLabelWidth / 3)
 		svg.select('.xaxis')
-			.attr('transform', `translate(0,${height - yMargin})`)
+			.attr('transform', `translate(0,${height - this.margin.top - this.margin.bottom})`)
 			.transition().call(this.xAxis)
 		
-		this.yScale.range([0, height - yMargin])
+		this.yScale.range([0, height - this.margin.bottom])
 		svg.select('.yaxis')
-			.attr('transform', `translate(${xMargin},0)`)
+			.attr('transform', `translate(${this.margin.left},0)`)
 			.transition().call(this.yAxis)
- 
+		
+		const ySize = this.yScale.bandwidth() / 2
 		svg.select('.data').selectAll('rect').remove()
-		svg.select('.data').selectAll('rect').data(activity).enter()
+		svg.select('.data').selectAll('rect').data(activity.filter(d => d.state != 'Absent')).enter()
 			.append('rect')
-			.attr('transform', d => `translate(${this.xScale(d.start)},${this.yScale(d.state)})`)
+			.attr('transform', d => `translate(${this.xScale(d.start)},${this.yScale(d.state) + ySize/2})`)
 			.attr('class', d => d.state.toLowerCase())
-			.attr('height', this.yScale.bandwidth())
+			.attr('height', ySize)
 			.attr('width', d => this.xScale(d.end) - this.xScale(d.start))
 	}
 }
@@ -161,9 +163,14 @@ class VisualizationManager
 				this.visualizations.push(new this.#vizClasses[v.type](el, v.params))
 			}
 		}
+		//window.addEventListener('resize', this.resize, true)
 	}
 
 	setData(data) {
-		this.visualizations.forEach(v => v.redraw(data))
+		this.visualizations.forEach(v => v.redraw && v.redraw(data))
+	}
+
+	resize() {
+		this.visualizations.forEach(v => v.resize && v.resize(data))
 	}
 }
