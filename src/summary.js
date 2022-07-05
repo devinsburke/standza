@@ -12,10 +12,14 @@ class Summary {
         this['activity'] = []
         let f = moments[0]
 
+        for (const s in PersonState) {
+            this[`states.${s.toLowerCase()}.total`] = 0
+            this[`states.${s.toLowerCase()}.last`] = f.timestamp
+        }
+
         for (const m of [...moments, {timestamp: getNow()}])
             if (f.assumedState != m.assumedState) {
                 const prefix = `states.${f.assumedState.toLowerCase()}`
-                this[`${prefix}.total`] ??= 0
                 this[`${prefix}.total`] += m.timestamp - f.timestamp
                 this[`${prefix}.last`] = m.timestamp
                 this['activity'].push({ state: f.assumedState, start: f.timestamp, end: m.timestamp })
@@ -36,8 +40,6 @@ class Summary {
 
     #injectStates() {
         for (const s in PersonState) {
-            this[`states.${s.toLowerCase()}.total`] ??= 0
-            this[`states.${s.toLowerCase()}.last`] ??= 0
             this[`states.${s.toLowerCase()}.since`] = this['timestamp'] - this[`states.${s.toLowerCase()}.last`]
             this[`states.${s.toLowerCase()}.potential`] = this['schedule.day.balance'] + this[`states.${s.toLowerCase()}.total`]
 
